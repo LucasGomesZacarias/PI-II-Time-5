@@ -6,7 +6,7 @@
 * Felipe Evangelista Cruz
 * [NOME COMPLETO DO INTEGRANTE 3]
 * Lucas Gomes Zacarias 
-* [NOME COMPLETO DO INTEGRANTE 5]
+* Luiz Felipe da Conceição
 
 ## Curso
 
