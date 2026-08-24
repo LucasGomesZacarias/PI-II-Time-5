@@ -4,7 +4,7 @@
 
 * Augusto Henrique Marçura
 * Felipe Evangelista Cruz
-* [NOME COMPLETO DO INTEGRANTE 3]
+* Gabriel Grigoletto Ribas
 * Lucas Gomes Zacarias 
 * Luiz Felipe da Conceição
 
