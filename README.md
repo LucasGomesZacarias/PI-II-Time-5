@@ -2,7 +2,7 @@
 
 ## Integrantes
 
-* [NOME COMPLETO DO INTEGRANTE 1]
+* Augusto Henrique Marçura
 * Felipe Evangelista Cruz
 * [NOME COMPLETO DO INTEGRANTE 3]
 * Lucas Gomes Zacarias 
