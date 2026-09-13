@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <title>Nexo.</title>
+</head>
+<body>
+    <section class="containerPai">
+        <div class="card cadastroActive">
+            <div class="terminalBarra">
+                <span class="bolinha bolinhaVermelha"></span>
+                <span class="bolinha bolinhaAmarela"></span>
+                <span class="bolinha bolinhaVerde"></span>
+                <span class="terminalMarca">nexo<span>.</span></span>
+            </div>
+            <div class="conteudo">
+                <div class="esquerda">
+                    <div class="formLogin">
+                        <h2>Fazer Login</h2>
+                        <form>
+                            <label for="email_id" class="somenteLeitor">E-mail: </label>
+                            <input type="email" name="email" id="email_id" placeholder="E-mail">
+                            <label for="senha_id" class="somenteLeitor">Senha: </label>
+                            <input type="password" name="senha" id="senha_id" placeholder="Senha">
+                            <button type="submit">Entrar</button>
+                        </form>
+                    </div>
+                    <div class="facaLogin">
+                        <h2>Já tem <br> uma conta?</h2>
+                        <p>Continue de onde parou e acompanhe as demandas do seu projeto.</p>
+                        <button type="button" id="btnFacaLogin">Faça Login</button>
+                    </div>
+                </div>
+                <div class="direita">
+                    <div class="formCadastro">
+                        <h2>Cadastro</h2>
+                        <form>
+                            <label for="nome_id" class="somenteLeitor">Nome: </label>
+                            <input type="text" name="nome" id="nome_id" placeholder="Nome">
+                            <label for="emailCadastro_id" class="somenteLeitor">E-mail: </label>
+                            <input type="email" name="email" id="emailCadastro_id" placeholder="E-mail">
+                            <label for="senhaCadastro_id" class="somenteLeitor">Senha: </label>
+                            <input type="password" name="senha" id="senhaCadastro_id" placeholder="Senha">
+                            <label for="confirmaSenha_id" class="somenteLeitor">Confirme a sua senha: </label>
+                            <input type="password" name="confirmaSenha" id="confirmaSenha_id" placeholder="Confirme a sua senha">
+                            <button type="submit">Cadastrar</button>
+                        </form>
+                    </div>
+                    <div class="facaCadastro">
+                        <h2>Não tem <br> conta?</h2>
+                        <p>Crie sua conta e comece a organizar as demandas do seu time.</p>
+                        <button type="button" id="btnFacaCadastro">Cadastre-se</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
