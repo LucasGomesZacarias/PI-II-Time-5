@@ -1,0 +1,162 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0a0a0f;
+    color: #edecf3;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 40px;
+    border-bottom: 1px solid #2c2a3a;
+}
+
+header h1 {
+    color: #edecf3;
+    font-size: 28px;
+    font-family: "JetBrains Mono", monospace;
+}
+
+header h1 span {
+    color: #6d4aff;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    color: #9a97ac;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav a:hover {
+    color: #edecf3;
+}
+
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+main > a {
+    color: #9a97ac;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+main > a:hover {
+    color: #edecf3;
+}
+
+section {
+    background-color: #15141c;
+    border: 1px solid #2c2a3a;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 25px;
+}
+
+section h2 {
+    font-size: 24px;
+    margin-top: 8px;
+    margin-bottom: 25px;
+    font-family: "JetBrains Mono", monospace;
+}
+
+section h3 {
+    font-size: 14px;
+    margin-top: 25px;
+    margin-bottom: 8px;
+}
+
+section p {
+    color: #9a97ac;
+}
+
+.etiquetas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.etiquetas p {
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.etiquetas .status {
+    color: #f5a623;
+    background-color: #1e1d29;
+}
+
+.etiquetas .prioridade {
+    color: #ff9f40;
+    background-color: #1e1d29;
+}
+
+.etiquetas .tipo {
+    color: #edecf3;
+    background-color: #1e1d29;
+}
+
+.informacoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.informacoes div {
+    width: 45%;
+}
+
+.comentarios h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.comentario {
+    background-color: #1e1d29;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 6px;
+}
+
+.comentario .autor {
+    color: #edecf3;
+    font-weight: bold;
+    margin-bottom: 8px
+}
+
+.comentario .data {
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.historico h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.alteracao {
+    border-left: 3px solid #6d4aff;
+    padding-left: 15px;
+    margin-top: 15px;
+}
+
+.alteracao .data {
+    font-size: 12px;
+    margin-bottom: 6px;
+}
