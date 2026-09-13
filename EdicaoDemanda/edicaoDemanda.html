@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edição de Demanda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="styleEdicaoDemanda.css">
+</head>
+<body> 
+    <header>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Edição de Demanda</h2>
+                <br>
+            </div>
+        </div>
+    </header>
+    
+
+    <main>
+        <form>
+            <div class="row">
+
+            <br><br>
+            <h3>Dados da Demanda</h3>
+            <hr>
+            <br>
+
+
+            <div id="containerTitulo" class="col-md-2">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+                <div id="erroTitulo" class="invalid-feedback"></div>
+            </div>
+
+            <div id="containerTipo" class="col-md-2">
+                <label for="tipo">Tipo:</label>
+                <select id="tipo" name="tipo" required>
+                    <option ></option>
+                    <option>Tarefa</option>
+                    <option>Defeito</option>
+                    <option>Melhoria</option>
+                    <option>Documentação</option>
+                </select>
+                <div id="erroTipo" class="invalid-feedback"></div>
+            </div>
+
+            <div id="containerPrioridade" class="col-md-2">
+                <label for="prioridade">Prioridade:</label>
+                <select id="prioridade" name="prioridade" required>
+                    <option ></option>
+                    <option>Crítica</option>
+                    <option>Alta</option>
+                    <option>Média</option>
+                    <option>Baixa</option>
+                </select>
+                <div id="erroPrioridade" class="invalid-feedback"></div>
+
+            </div>
+
+            <div class="col-md-3" id="containerCriacao">
+                <p>Data de Criação: 00/00/0000</p>
+            </div>
+
+            <div class="col-md-3" id="containerAtualizacao">
+                <p>Data de Atualização: 00/00/0000</p>
+            </div>
+        </div>
+
+
+        <br><br>
+        <h3>Detalhes da Demanda</h3>
+        <hr>
+        <br>
+
+
+        <div class="row">
+            <div class="col-md-3" id="containerResponsavel">
+                <label for="responsavel">Responsável:</label>
+                <input type="text" id="responsavel" name="responsavel">
+            </div>
+
+             <div class="col-md-3" id="containerAssociado">
+                <label for="associado">Projeto Associado:</label>
+                <input type="text" id="associado" name="associado" required>
+                <div id="erroAssociado" class="invalid-feedback"></div>
+            </div>
+
+             <div class="col-md-3" id="containerPrazo">
+                <label for="prazo">Prazo de Finalização:</label>
+                <input type="date" id="prazo" name="prazo">
+            </div>
+
+            <div class="col-md-3" id="containerStatus">
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option>Aberta</option>
+                    <option>Em andamento</option>
+                    <option>Em revisão</option>
+                    <option>Concluída</option>
+                    <option>Cancelada</option>
+                </select>
+                <div id="erroStatus" class="invalid-feedback"></div>
+
+            </div>
+        </div>
+
+        <br><br>
+        <h3>Descrição</h3>
+        <hr>
+
+
+        <div class="row">
+            <div class="col-md-12" id="containerDescricao">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" required></textarea>
+                <div id="erroDescricao" class="invalid-feedback"></div>
+            </div>
+        </div>
+
+
+        <a href="#"><button type="button" id="cancelar">Cancelar</button></a>
+        <button type="submit">Salvar</button>
+        </form>
+    </main>
+</body>
+</html>
