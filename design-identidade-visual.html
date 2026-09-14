@@ -1,0 +1,370 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Nexo Design System</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    background-color: #0a0a0f;
+    color: #edecf3;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px 72px 24px;
+  }
+
+  h1, h2, h3 { margin: 0; }
+
+  /* rótulo pequeno em maiúsculas, usado várias vezes */
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #67647a;
+  }
+
+  .section {
+    border-top: 1px solid #2c2a3a;
+    padding-top: 28px;
+    margin-top: 56px;
+  }
+  .section h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .section-intro {
+    color: #9a97ac;
+    max-width: 640px;
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  /* Cabeçalho */
+  .hero { margin-bottom: 0; }
+  .wordmark {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 48px;
+    color: #edecf3;
+    margin: 10px 0 14px 0;
+  }
+  .wordmark span { color: #b3a3ff; }
+  .tagline { color: #9a97ac; max-width: 560px; font-size: 17px; margin-bottom: 14px; }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #9a97ac;
+    border: 1px solid #2c2a3a;
+    border-radius: 20px;
+    padding: 4px 10px;
+  }
+
+  @media (max-width: 480px) {
+    .wordmark { font-size: 34px; }
+    .tagline { font-size: 15px; }
+  }
+
+  /* Paleta */
+  .swatch-group { margin-bottom: 24px; }
+  .swatch-group h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #67647a;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .swatch {
+    width: 140px;
+    border: 1px solid #2c2a3a;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #15141c;
+  }
+  .swatch-color { height: 56px; }
+  .swatch-label { padding: 8px 10px; }
+  .swatch-name { display: block; font-size: 13px; font-weight: bold; }
+  .swatch-hex { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9a97ac; }
+
+  /* Tipografia */
+  .type-specimen { margin-bottom: 22px; }
+  .type-role {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #67647a;
+    margin-bottom: 8px;
+  }
+  .type-display-sample { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 36px; }
+  .type-body-sample { font-size: 16px; line-height: 1.65; max-width: 620px; margin: 0; }
+  .type-mono-sample {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    background-color: #15141c;
+    border: 1px solid #2c2a3a;
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: inline-block;
+  }
+
+  @media (max-width: 480px) {
+    .type-display-sample { font-size: 26px; }
+  }
+
+  /* Componentes */
+  .comp-block { margin-bottom: 26px; }
+  .comp-label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #67647a;
+    margin-bottom: 10px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+  button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 10px 18px;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary { background-color: #6d4aff; color: #ffffff; }
+  .btn-primary:hover { background-color: #8566ff; }
+  .btn-secondary { background-color: #1e1d29; color: #edecf3; border: 1px solid #2c2a3a; }
+  .btn-ghost { background-color: transparent; color: #b3a3ff; padding-left: 6px; padding-right: 6px; }
+
+  /* badges: fundo sólido na cor do status/prioridade + texto escuro pra contraste */
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: #141319;
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: inline-block;
+  }
+  .badge-open { background-color: #4ea1ff; }
+  .badge-progress { background-color: #f5a623; }
+  .badge-review { background-color: #2dd4bf; }
+  .badge-done { background-color: #34d399; }
+  .badge-cancelled { background-color: #8d899c; }
+  .badge-critical { background-color: #ff5470; }
+  .badge-high { background-color: #ff9f40; }
+  .badge-medium { background-color: #ffd166; }
+  .badge-low { background-color: #8b98a8; }
+
+  .demand-card {
+    border: 1px solid #2c2a3a;
+    border-radius: 8px;
+    background-color: #15141c;
+    padding: 16px 18px;
+    max-width: 520px;
+  }
+  .demand-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .demand-id { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #67647a; }
+  .demand-title { font-weight: bold; font-size: 15px; display: block; margin-bottom: 10px; }
+  .demand-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .demand-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    color: #9a97ac;
+    border-top: 1px solid #211f2c;
+    padding-top: 10px;
+  }
+  .demand-footer .value { font-family: 'JetBrains Mono', monospace; color: #9a97ac; }
+
+  .usage-text { color: #9a97ac; font-size: 15px; max-width: 620px; }
+  pre.code-block {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    background-color: #1e1d29;
+    border: 1px solid #2c2a3a;
+    border-radius: 6px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    color: #edecf3;
+    white-space: pre;
+  }
+  .code-comment { color: #67647a; }
+
+  footer.note { color: #67647a; font-size: 13px; }
+
+  @media (max-width: 480px) {
+    .demand-top, .demand-footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <p class="eyebrow">Projeto Integrador II - Engenharia de Software - PUC-Campinas</p>
+    <h1 class="wordmark">nexo<span>.</span></h1>
+    <p class="tagline">Sistema de Acompanhamento de Demandas de Desenvolvimento - identidade visual do grupo para as cinco telas da Reuniao 2.</p>
+    <div class="meta-row">
+      <span class="chip">HTML5</span>
+      <span class="chip">CSS3</span>
+      <span class="chip">JavaScript</span>
+      <span class="chip">Node.js + TypeScript</span>
+      <span class="chip">Express</span>
+      <span class="chip">MySQL</span>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2>Paleta de cores</h2>
+    <p class="section-intro">Fundo escuro para uma ferramenta de uso continuo por quem desenvolve. As cores de status e prioridade sao diferentes da cor de destaque, para nao confundir "botao clicavel" com "prioridade critica".</p>
+
+    <div class="swatch-group">
+      <h3>Base</h3>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background-color:#0a0a0f"></div><div class="swatch-label"><span class="swatch-name">Fundo</span><span class="swatch-hex">#0A0A0F</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#15141c"></div><div class="swatch-label"><span class="swatch-name">Superficie</span><span class="swatch-hex">#15141C</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#1e1d29"></div><div class="swatch-label"><span class="swatch-name">Superficie 2</span><span class="swatch-hex">#1E1D29</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#2c2a3a"></div><div class="swatch-label"><span class="swatch-name">Borda</span><span class="swatch-hex">#2C2A3A</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#edecf3"></div><div class="swatch-label"><span class="swatch-name">Texto</span><span class="swatch-hex">#EDECF3</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#9a97ac"></div><div class="swatch-label"><span class="swatch-name">Texto 2</span><span class="swatch-hex">#9A97AC</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#6d4aff"></div><div class="swatch-label"><span class="swatch-name">Destaque</span><span class="swatch-hex">#6D4AFF</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#8566ff"></div><div class="swatch-label"><span class="swatch-name">Destaque hover</span><span class="swatch-hex">#8566FF</span></div></div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <h3>Status da demanda</h3>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background-color:#4ea1ff"></div><div class="swatch-label"><span class="swatch-name">Aberta</span><span class="swatch-hex">#4EA1FF</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#f5a623"></div><div class="swatch-label"><span class="swatch-name">Em andamento</span><span class="swatch-hex">#F5A623</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#2dd4bf"></div><div class="swatch-label"><span class="swatch-name">Em revisao</span><span class="swatch-hex">#2DD4BF</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#34d399"></div><div class="swatch-label"><span class="swatch-name">Concluida</span><span class="swatch-hex">#34D399</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#8d899c"></div><div class="swatch-label"><span class="swatch-name">Cancelada</span><span class="swatch-hex">#8D899C</span></div></div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <h3>Prioridade</h3>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background-color:#ff5470"></div><div class="swatch-label"><span class="swatch-name">Critica</span><span class="swatch-hex">#FF5470</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#ff9f40"></div><div class="swatch-label"><span class="swatch-name">Alta</span><span class="swatch-hex">#FF9F40</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#ffd166"></div><div class="swatch-label"><span class="swatch-name">Media</span><span class="swatch-hex">#FFD166</span></div></div>
+        <div class="swatch"><div class="swatch-color" style="background-color:#8b98a8"></div><div class="swatch-label"><span class="swatch-name">Baixa</span><span class="swatch-hex">#8B98A8</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Tipografia</h2>
+    <p class="section-intro">Uma unica fonte do Google Fonts (JetBrains Mono) nos titulos, ligada ao editor JetBrains WebStorm liberado pela disciplina. O texto corrido usa Arial/Helvetica, igual aos exemplos vistos em aula.</p>
+
+    <div class="type-specimen">
+      <span class="type-role">Titulo - JetBrains Mono</span>
+      <span class="type-display-sample">Painel de Demandas</span>
+    </div>
+
+    <div class="type-specimen">
+      <span class="type-role">Texto - Arial / Helvetica</span>
+      <p class="type-body-sample">O Lider de Projeto pode reatribuir o responsavel, alterar a prioridade e mover a demanda entre os status previstos no fluxo de trabalho, respeitando as permissoes de cada perfil de acesso.</p>
+    </div>
+
+    <div class="type-specimen">
+      <span class="type-role">Dados - JetBrains Mono</span>
+      <div class="type-mono-sample">DEM-1042 - Alta - Em andamento - prazo 18/09/2026</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Componentes</h2>
+    <p class="section-intro">Aplicacao pratica da paleta e da tipografia nos elementos que se repetem nas cinco telas do grupo.</p>
+
+    <div class="comp-block">
+      <span class="comp-label">Botoes</span>
+      <div class="row">
+        <button class="btn-primary">Entrar</button>
+        <button class="btn-secondary">Cancelar</button>
+        <button class="btn-ghost">Ver detalhes</button>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <span class="comp-label">Badges de status</span>
+      <div class="row">
+        <span class="badge badge-open">Aberta</span>
+        <span class="badge badge-progress">Em andamento</span>
+        <span class="badge badge-review">Em revisao</span>
+        <span class="badge badge-done">Concluida</span>
+        <span class="badge badge-cancelled">Cancelada</span>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <span class="comp-label">Badges de prioridade</span>
+      <div class="row">
+        <span class="badge badge-critical">Critica</span>
+        <span class="badge badge-high">Alta</span>
+        <span class="badge badge-medium">Media</span>
+        <span class="badge badge-low">Baixa</span>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <span class="comp-label">Card de demanda (listagem)</span>
+      <div class="demand-card">
+        <div class="demand-top">
+          <span class="demand-id">DEM-1042</span>
+          <span class="badge badge-high">Alta</span>
+        </div>
+        <span class="demand-title">Corrigir validacao de prazo em feriados nacionais</span>
+        <div class="demand-meta">
+          <span class="badge badge-progress">Em andamento</span>
+          <span class="chip">Defeito</span>
+        </div>
+        <div class="demand-footer">
+          <span>Responsavel: <span class="value">Ana Ferreira</span></span>
+          <span>Prazo: <span class="value">18/09/2026</span></span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <h2>Como aplicar</h2>
+    <p class="usage-text">Coloquem os hex abaixo direto no CSS de cada tela (igual aos exemplos das aulas - sem variavel, sem <code>:root</code>). O mais facil e cada um copiar essa lista de cores e reusar nos proprios seletores.</p>
+    <pre class="code-block"><span class="code-comment">&lt;!-- no head de cada pagina --&gt;</span>
+&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap"&gt;
+
+<span class="code-comment">/* cores principais do sistema Nexo */</span>
+<span class="code-comment">/* fundo: #0a0a0f          superficie: #15141c */</span>
+<span class="code-comment">/* texto: #edecf3          texto secundario: #9a97ac */</span>
+<span class="code-comment">/* destaque (botoes/links): #6d4aff   hover: #8566ff */</span>
+
+<span class="code-comment">/* status: aberta #4ea1ff, andamento #f5a623, revisao #2dd4bf, concluida #34d399, cancelada #8d899c */</span>
+<span class="code-comment">/* prioridade: critica #ff5470, alta #ff9f40, media #ffd166, baixa #8b98a8 */</span></pre>
+    <footer class="note">"nexo" e um nome provisorio - troquem no cabecalho, no README e no repositorio quando o grupo decidir o nome final do sistema. A paleta e a fonte continuam valendo.</footer>
+  </section>
+
+</div>
+
+</body></html>
