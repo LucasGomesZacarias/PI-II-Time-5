@@ -28,9 +28,8 @@ a {
 
 .logo {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 800;
-  letter-spacing: 0.5px;
 }
 
 .logo span {
@@ -315,9 +314,9 @@ h1 {
 
 footer {
   background-color: #15141c;
-  border: 1px solid #2c2a3a;
+  border-top: 1px solid #2c2a3a;
   color: #9a97ac;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   padding: 20px 24px;
   text-align: center;
 }

@@ -22,7 +22,7 @@ header {
 
 header h1 {
     color: #edecf3;
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 800;
     font-family: "JetBrains Mono", monospace;
 }
@@ -185,4 +185,13 @@ section p {
 .alteracao .data {
     font-size: 12px;
     margin-bottom: 6px;
+}
+
+footer {
+    background-color: #15141c;
+    border-top: 1px solid #2c2a3a;
+    color: #9a97ac;
+    font-size: 12px;
+    padding: 20px 24px;
+    text-align: center;
 }
