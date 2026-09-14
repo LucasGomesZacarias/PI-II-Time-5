@@ -15,33 +15,59 @@ header {
     justify-content: space-between;
     align-items: center;
 
-    padding: 20px 40px;
+    padding: 16px 7%;
+    background-color: #15141c;
     border-bottom: 1px solid #2c2a3a;
 }
 
 header h1 {
     color: #edecf3;
-    font-size: 28px;
+    font-size: 20px;
+    font-weight: 800;
     font-family: "JetBrains Mono", monospace;
 }
 
 header h1 span {
-    color: #6d4aff;
+    color: #b3a3ff;
 }
 
-nav {
+.menu {
     display: flex;
-    gap: 30px;
+    gap: 8px;
 }
 
-nav a {
+.menu a {
     color: #9a97ac;
     text-decoration: none;
-    font-size: 16px;
+    padding: 9px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 
-nav a:hover {
+.menu a:hover,
+.menu .ativo {
+    background-color: #6d4aff;
     color: #edecf3;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.9rem;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #6d4aff;
+    color: #edecf3;
+    font-size: 0.75rem;
+    font-weight: bold;
 }
 
 main {
