@@ -1,3 +1,4 @@
+<!-- LUIZ FELIPE DA CONCEICAO -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,6 +12,7 @@
 <body>
     <section class="containerPai">
         <div class="card cadastroActive">
+            <!-- Barra do topo -->
             <div class="terminalBarra">
                 <span class="bolinha bolinhaVermelha"></span>
                 <span class="bolinha bolinhaAmarela"></span>
@@ -18,38 +20,77 @@
                 <span class="terminalMarca">nexo<span>.</span></span>
             </div>
             <div class="conteudo">
+                <!-- Lado esquerdo: login -->
                 <div class="esquerda">
                     <div class="formLogin">
                         <h2>Fazer Login</h2>
-                        <form>
-                            <label for="email_id" class="somenteLeitor">E-mail: </label>
-                            <input type="email" name="email" id="email_id" placeholder="E-mail">
-                            <label for="senha_id" class="somenteLeitor">Senha: </label>
-                            <input type="password" name="senha" id="senha_id" placeholder="Senha">
+                        <!-- novalidate: as mensagens de erro vêm do script.js -->
+                        <form id="formularioLogin" novalidate>
+                            <!-- E-mail -->
+                            <div class="campo">
+                                <label for="email_id" class="somenteLeitor">E-mail: </label>
+                                <input type="email" name="email" id="email_id" placeholder="E-mail"
+                                    autocomplete="email" aria-describedby="erroEmailLogin">
+                                <div id="erroEmailLogin" class="mensagemErro"></div>
+                            </div>
+                            <!-- Senha -->
+                            <div class="campo">
+                                <label for="senha_id" class="somenteLeitor">Senha: </label>
+                                <input type="password" name="senha" id="senha_id" placeholder="Senha"
+                                    autocomplete="current-password" aria-describedby="erroSenhaLogin">
+                                <div id="erroSenhaLogin" class="mensagemErro"></div>
+                            </div>
                             <button type="submit">Entrar</button>
+                            <!-- Mensagem quando os dados estão certos -->
+                            <div id="mensagemLogin" class="mensagemSucesso" role="status"></div>
                         </form>
                     </div>
+                    <!-- Painel para ir para o login -->
                     <div class="facaLogin">
                         <h2>Já tem <br> uma conta?</h2>
                         <p>Continue de onde parou e acompanhe as demandas do seu projeto.</p>
                         <button type="button" id="btnFacaLogin">Faça Login</button>
                     </div>
                 </div>
+                <!-- Lado direito: cadastro -->
                 <div class="direita">
                     <div class="formCadastro">
                         <h2>Cadastro</h2>
-                        <form>
-                            <label for="nome_id" class="somenteLeitor">Nome: </label>
-                            <input type="text" name="nome" id="nome_id" placeholder="Nome">
-                            <label for="emailCadastro_id" class="somenteLeitor">E-mail: </label>
-                            <input type="email" name="email" id="emailCadastro_id" placeholder="E-mail">
-                            <label for="senhaCadastro_id" class="somenteLeitor">Senha: </label>
-                            <input type="password" name="senha" id="senhaCadastro_id" placeholder="Senha">
-                            <label for="confirmaSenha_id" class="somenteLeitor">Confirme a sua senha: </label>
-                            <input type="password" name="confirmaSenha" id="confirmaSenha_id" placeholder="Confirme a sua senha">
+                        <form id="formularioCadastro" novalidate>
+                            <!-- Nome -->
+                            <div class="campo">
+                                <label for="nome_id" class="somenteLeitor">Nome: </label>
+                                <input type="text" name="nome" id="nome_id" placeholder="Nome"
+                                    autocomplete="name" aria-describedby="erroNome">
+                                <div id="erroNome" class="mensagemErro"></div>
+                            </div>
+                            <!-- E-mail -->
+                            <div class="campo">
+                                <label for="emailCadastro_id" class="somenteLeitor">E-mail: </label>
+                                <input type="email" name="email" id="emailCadastro_id" placeholder="E-mail"
+                                    autocomplete="email" aria-describedby="erroEmailCadastro">
+                                <div id="erroEmailCadastro" class="mensagemErro"></div>
+                            </div>
+                            <!-- Senha -->
+                            <div class="campo">
+                                <label for="senhaCadastro_id" class="somenteLeitor">Senha: </label>
+                                <input type="password" name="senha" id="senhaCadastro_id" placeholder="Senha"
+                                    autocomplete="new-password" aria-describedby="erroSenhaCadastro">
+                                <div id="erroSenhaCadastro" class="mensagemErro"></div>
+                            </div>
+                            <!-- Confirmação da senha -->
+                            <div class="campo">
+                                <label for="confirmaSenha_id" class="somenteLeitor">Confirme a sua senha: </label>
+                                <input type="password" name="confirmaSenha" id="confirmaSenha_id" placeholder="Confirme a sua senha"
+                                    autocomplete="new-password" aria-describedby="erroConfirmaSenha">
+                                <div id="erroConfirmaSenha" class="mensagemErro"></div>
+                            </div>
                             <button type="submit">Cadastrar</button>
+                            <!-- Mensagem quando os dados estão certos -->
+                            <div id="mensagemCadastro" class="mensagemSucesso" role="status"></div>
                         </form>
                     </div>
+                    <!-- Painel para ir para o cadastro -->
                     <div class="facaCadastro">
                         <h2>Não tem <br> conta?</h2>
                         <p>Crie sua conta e comece a organizar as demandas do seu time.</p>
