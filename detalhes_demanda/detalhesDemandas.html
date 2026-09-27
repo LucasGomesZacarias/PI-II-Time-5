@@ -7,29 +7,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script type="module" src="/componentes/libComps.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="cabecalho">
-
-        <h1>nexo<span>.</span></h1>
-
-        <nav class="menu">
-            <a href="#">Dashboard</a>
-            <a href="#" class="ativo">Demandas</a>
-        </nav>
-
-        <div class="usuario">
-            <span class="avatar">CL</span>
-            <span>Caio Lima</span>
-        </div>
-
-    </header>
+    <comp-navbar pagina-atual="demandas"></comp-navbar>
 
     <main>
 
-        <a href="#">Voltar para demandas</a>
+        <a href="/ListagemDemandas/ListagemDemandas.html">Voltar para demandas</a>
 
         <section>
             <p>DEM-1042</p>
