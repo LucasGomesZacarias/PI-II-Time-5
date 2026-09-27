@@ -1,15 +1,18 @@
+/* Remove estilos padrão do navegador e padroniza o cálculo dos tamanhos. */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Cores e tipografia base da página. */
 body {
     background-color: #0a0a0f;
     color: #edecf3;
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Alinha a marca e a navegação no topo da tela. */
 header {
     display: flex;
     justify-content: space-between;
@@ -44,6 +47,7 @@ nav a:hover {
     color: #edecf3;
 }
 
+/* Centraliza o conteúdo e limita sua largura para facilitar a leitura. */
 main {
     max-width: 1000px;
     margin: 0 auto;
@@ -60,6 +64,7 @@ main > a:hover {
     color: #edecf3;
 }
 
+/* Aparência comum dos cartões de conteúdo. */
 section {
     background-color: #15141c;
     border: 1px solid #2c2a3a;
@@ -85,6 +90,7 @@ section p {
     color: #9a97ac;
 }
 
+/* Agrupa os indicadores de status, prioridade e tipo da demanda. */
 .etiquetas {
     display: flex;
     gap: 10px;
@@ -112,6 +118,7 @@ section p {
     background-color: #1e1d29;
 }
 
+/* Organiza os dados da demanda em colunas que podem quebrar de linha. */
 .informacoes {
     display: flex;
     flex-wrap: wrap;
@@ -127,6 +134,7 @@ section p {
     font-size: 18px;
 }
 
+/* Destaca visualmente cada comentário. */
 .comentario {
     background-color: #1e1d29;
     padding: 15px;
@@ -150,6 +158,7 @@ section p {
     font-size: 18px;
 }
 
+/* Marca cada evento do histórico com uma linha lateral. */
 .alteracao {
     border-left: 3px solid #6d4aff;
     padding-left: 15px;
@@ -159,4 +168,8 @@ section p {
 .alteracao .data {
     font-size: 12px;
     margin-bottom: 6px;
+}
+/* Usa fonte monoespaçada para destacar o identificador da demanda. */
+.codigo {
+    font-family: "JetBrains Mono", monospace;
 }
