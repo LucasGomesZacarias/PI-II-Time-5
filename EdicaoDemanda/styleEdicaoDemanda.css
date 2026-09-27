@@ -11,13 +11,74 @@ body {
     color: #EDECF3;
 }
 
-header {
+.cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 7%;
+
+    background-color: #15141C;
+    border-bottom: 1px solid #2C2A3A;
+}
+
+.logo {
+    color: #EDECF3;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #B3A3FF;
+}
+
+.menu {
+    display: flex;
+    gap: 8px;
+}
+
+.menu a {
+    color: #EDECF3;
+    text-decoration: none;
+    padding: 9px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.menu a:hover,
+.menu .ativo {
+    background-color: #6D4AFF;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.9rem;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #6D4AFF;
+    color: #EDECF3;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.titulo-secao {
     background-color: #15141C;
     border-bottom: 1px solid #2C2A3A;
     padding: 20px;
 }
 
-header h2 {
+.titulo-secao h2 {
     font-family: 'JetBrains Mono', monospace;
     color: #EDECF3;
 }
@@ -88,6 +149,15 @@ button:hover {
 
 #cancelar:hover {
     background-color: #2C2A3A;
+}
+
+footer {
+    background-color: #15141C;
+    border-top: 1px solid #2C2A3A;
+    color: #9A97AC;
+    font-size: 12px;
+    padding: 20px 24px;
+    text-align: center;
 }
 
 p{

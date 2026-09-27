@@ -1,3 +1,5 @@
+ /* Lucas Gomes Zacarias - RA 26003288 */
+
 * {
     margin: 0;
     padding: 0;
@@ -31,8 +33,13 @@ a {
 }
 
 .logo {
-    font-size: 20px;
-    font-weight: bold;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #b3a3ff;
 }
 
 .menu {
@@ -105,6 +112,7 @@ main {
 h1 {
     margin-bottom: 10px;
 
+    font-family: 'JetBrains Mono', monospace;
     font-size: 32px;
     line-height: 1.2;
 }
@@ -181,6 +189,7 @@ h1 {
 }
 
 .titulo-bloco h2 {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 18px;
 }
 

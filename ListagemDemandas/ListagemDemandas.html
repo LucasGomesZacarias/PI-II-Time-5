@@ -1,31 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 
+<!-- Lucas Gomes Zacarias - RA 26003288 -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
     <link rel="stylesheet" href="Listagem.css">
+    <script type="module" src="/componentes/libComps.js"></script>
     <title>Nexo - Lista de Demandas</title>
 </head>
 
 <body>
 
-    <header class="cabecalho">
-
-        <a href="#inicio" class="logo">nexo.</a>
-
-        <nav class="menu">
-            <a href="#dashboard">Dashboard</a>
-            <a href="#demandas" class="ativo">Demandas</a>
-            <a href="#projetos">Projetos</a>
-        </nav>
-
-        <div class="usuario">
-            <span class="avatar">CL</span>
-            <span>Caio Lima</span>
-        </div>
-
-    </header>
+    <comp-navbar pagina-atual="demandas"></comp-navbar>
 
     <main id="demandas">
 
@@ -41,210 +30,65 @@
                     registradas no sistema de acordo com seu perfil de acesso.
                 </p>
             </div>
-
-            <button class="botao" type="button">
-                + Nova Demanda
-            </button>
-
-        </section>
-
-        <form class="filtros">
-
-            <input
-                type="text"
-                placeholder="Buscar por título ou ID da demanda..."
-                aria-label="Buscar demanda"
-            >
-
-            <select aria-label="Filtrar por projeto">
-                <option value="">Todos os Projetos</option>
-                <option value="nexo">Nexo</option>
-                <option value="alpha">Alpha ERP</option>
-            </select>
-
-            <select aria-label="Filtrar por status">
-                <option value="">Todos os Status</option>
-                <option value="aberta">Aberta</option>
-                <option value="andamento">Em Andamento</option>
-                <option value="concluida">Concluída</option>
-            </select>
-
-            <button class="botao" type="submit">
-                Filtrar
-            </button>
-
-        </form>
-
-        <section class="bloco">
-
-            <div class="titulo-bloco">
-                <div>
-                    <p class="subtitulo">Listagem Completa</p>
-                    <h2>Demandas (48 resultados)</h2>
-                </div>
-            </div>
-
-            <div class="tabela-container">
-
-                <table class="tabela-demandas">
-
-                    <thead>
-                        <tr>
-                            <th>Título da Demanda</th>
-                            <th>Projeto</th>
-                            <th>Tipo</th>
-                            <th>Prioridade</th>
-                            <th>Status</th>
-                            <th>Responsável</th>
-                            <th>Data Criação</th>
-                            <th>Prazo (Fim)</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr>
-                            <td>
-                                <a href="#detalhes" class="titulo-demanda">
-                                    DEM-1041 - Corrigir validação de prazo
-                                </a>
-                            </td>
-
-                            <td>Nexo</td>
-                            <td>Defeito</td>
-
-                            <td>
-                                <span class="tag critica">Crítica</span>
-                            </td>
-
-                            <td>
-                                <span class="status aberta">Aberta</span>
-                            </td>
-
-                            <td>Ana Ferreira</td>
-                            <td>10/09/2026</td>
-                            <td>14/09/2026</td>
-
-                            <td class="acoes">
-                                <button class="btn-acao" type="button">
-                                    Detalhes
-                                </button>
-
-                                <button class="btn-acao" type="button">
-                                    Editar
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <a href="#detalhes" class="titulo-demanda">
-                                    DEM-1045 - Implementar filtro no painel
-                                </a>
-                            </td>
-
-                            <td>Alpha ERP</td>
-                            <td>Melhoria</td>
-
-                            <td>
-                                <span class="tag media">Média</span>
-                            </td>
-
-                            <td>
-                                <span class="status andamento">
-                                    Em andamento
-                                </span>
-                            </td>
-
-                            <td>Caio Lima</td>
-                            <td>11/09/2026</td>
-                            <td>19/09/2026</td>
-
-                            <td class="acoes">
-                                <button class="btn-acao" type="button">
-                                    Detalhes
-                                </button>
-
-                                <button class="btn-acao" type="button">
-                                    Editar
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <a href="#detalhes" class="titulo-demanda">
-                                    DEM-1048 - Documentar fluxo de cancelamento
-                                </a>
-                            </td>
-
-                            <td>Nexo</td>
-                            <td>Documentação</td>
-
-                            <td>
-                                <span class="tag baixa">Baixa</span>
-                            </td>
-
-                            <td>
-                                <span class="status concluida">
-                                    Concluída
-                                </span>
-                            </td>
-
-                            <td>Bruno Costa</td>
-                            <td>05/09/2026</td>
-                            <td>12/09/2026</td>
-
-                            <td class="acoes">
-                                <button class="btn-acao" type="button">
-                                    Detalhes
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <a href="#detalhes" class="titulo-demanda">
-                                    DEM-1050 - Atualizar dependências de segurança
-                                </a>
-                            </td>
-
-                            <td>Infraestrutura</td>
-                            <td>Tarefa</td>
-
-                            <td>
-                                <span class="tag alta">Alta</span>
-                            </td>
-
-                            <td>
-                                <span class="status aberta">Aberta</span>
-                            </td>
-
-                            <td>Não atribuído</td>
-                            <td>13/09/2026</td>
-                            <td>15/09/2026</td>
-
-                            <td class="acoes">
-                                <button class="btn-acao" type="button">
-                                    Detalhes
-                                </button>
-
-                                <button class="btn-acao" type="button">
-                                    Assumir
-                                </button>
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
+            <a href="/CadastroDemanda/cadastroDemanda.html">
+                <button class="botao" type="button">
+                    + Nova Demanda
+                </button>
+            </a>
 
         </section>
+
+        <form-demandas></form-demandas>
+
+        <lista-demandas id="minha-lista"></lista-demandas>
 
     </main>
+
+    <button id="btn-carregar" class="botao" style="margin-bottom: 20px;">
+        Mostrar Demandas ficticias
+    </button>
+
+    <script>
+    function carregarDemandas() {
+        const dadosSimulados = [
+            {
+                id: 1041,
+                codigo: "DEM-1041",
+                titulo: "Corrigir validação de prazo",
+                projeto: "Nexo",
+                tipo: "Defeito",
+                prioridade: "Crítica",
+                classePrioridade: "critica", 
+                status: "Aberta",
+                classeStatus: "aberta", 
+                responsavel: "Ana Ferreira",
+                dataCriacao: "10/09/2026",
+                prazo: "14/09/2026"
+            },
+            {
+                id: 1045,
+                codigo: "DEM-1045",
+                titulo: "Implementar filtro no painel",
+                projeto: "Alpha ERP",
+                tipo: "Melhoria",
+                prioridade: "Média",
+                classePrioridade: "media",
+                status: "Em andamento",
+                classeStatus: "andamento",
+                responsavel: "Caio Lima",
+                dataCriacao: "11/09/2026",
+                prazo: "19/09/2026"
+            }
+        ];
+
+        const componenteLista = document.getElementById('minha-lista');
+        componenteLista.demandas = dadosSimulados; 
+    }
+
+    const botao = document.getElementById('btn-carregar');
+    botao.addEventListener('click', carregarDemandas);
+
+</script>
 
     <footer>
         <p>

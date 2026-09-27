@@ -6,30 +6,20 @@
     <title>Nexo - Detalhes de Demanda</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script type="module" src="/componentes/libComps.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Cabeçalho com o nome do sistema e links de navegação. -->
-    <header>
-
-        <h1>nexo<span>.</span></h1>
-
-        <nav>
-            <a href="#">Dashboard</a>
-            <a href="#">Demandas</a>
-        </nav>
-
-    </header>
+    <comp-navbar pagina-atual="demandas"></comp-navbar>
 
     <main>
 
-        <a href="#">Voltar para demandas</a>
+        <a href="/ListagemDemandas/ListagemDemandas.html">Voltar para demandas</a>
 
-        <!-- Resumo da demanda: identificação, status, descrição e dados principais. -->
         <section>
-            <p class="codigo">DEM-1042</p>
+            <p>DEM-1042</p>
 
             <h2>Corrigir validação de prazo em feriados nacionais</h2>
 
@@ -44,7 +34,6 @@
             Corrigir a validação do prazo de finalização, para impedir datas que sejam feriados nacionais.
         </p>
 
-        <!-- Informações complementares da demanda organizadas em campos. -->
         <div class="informacoes">
 
             <div>
@@ -76,7 +65,6 @@
 
         </section>
 
-        <!-- Comentários registrados pelos participantes sobre a demanda. -->
         <section class="comentarios">
 
             <h3>Comentários</h3>
@@ -89,7 +77,6 @@
 
         </section>
 
-        <!-- Histórico das alterações feitas na demanda. -->
         <section class="historico">
 
             <h3>Histórico de alterações</h3>
@@ -103,6 +90,8 @@
 
     </main>
 
-    
+    <footer>
+        <p>nexo. - Sistema de acompanhamento de demandas de desenvolvimento</p>
+    </footer>
 </body>
 </html>

@@ -8,24 +8,13 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
   >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
+  <script type="module" src="/componentes/libComps.js"></script>
 </head>
 <body>
 
-  <header class="cabecalho">
-    <a class="logo" href="#inicio">nexo.</a>
-
-    <nav class="menu">
-      <a class="ativo" href="#inicio">Dashboard</a>
-      <a href="#demandas">Demandas</a>
-      <a href="#projetos">Projetos</a>
-    </nav>
-
-    <div class="usuario">
-      <span class="avatar">CL</span>
-      <span>Caio Lima</span>
-    </div>
-  </header>
+  <comp-navbar pagina-atual="dashboard"></comp-navbar>
 
   <main id="inicio">
     <div class="apresentacao">

@@ -1,53 +1,75 @@
-/* Remove estilos padrão do navegador e padroniza o cálculo dos tamanhos. */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Cores e tipografia base da página. */
 body {
     background-color: #0a0a0f;
     color: #edecf3;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Alinha a marca e a navegação no topo da tela. */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    padding: 20px 40px;
+    padding: 16px 7%;
+    background-color: #15141c;
     border-bottom: 1px solid #2c2a3a;
 }
 
 header h1 {
     color: #edecf3;
-    font-size: 28px;
+    font-size: 30px;
+    font-weight: 800;
     font-family: "JetBrains Mono", monospace;
 }
 
 header h1 span {
-    color: #6d4aff;
+    color: #b3a3ff;
 }
 
-nav {
+.menu {
     display: flex;
-    gap: 30px;
+    gap: 8px;
 }
 
-nav a {
+.menu a {
     color: #9a97ac;
     text-decoration: none;
-    font-size: 16px;
+    padding: 9px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 
-nav a:hover {
+.menu a:hover,
+.menu .ativo {
+    background-color: #6d4aff;
     color: #edecf3;
 }
 
-/* Centraliza o conteúdo e limita sua largura para facilitar a leitura. */
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.9rem;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #6d4aff;
+    color: #edecf3;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
 main {
     max-width: 1000px;
     margin: 0 auto;
@@ -64,7 +86,6 @@ main > a:hover {
     color: #edecf3;
 }
 
-/* Aparência comum dos cartões de conteúdo. */
 section {
     background-color: #15141c;
     border: 1px solid #2c2a3a;
@@ -90,7 +111,6 @@ section p {
     color: #9a97ac;
 }
 
-/* Agrupa os indicadores de status, prioridade e tipo da demanda. */
 .etiquetas {
     display: flex;
     gap: 10px;
@@ -118,7 +138,6 @@ section p {
     background-color: #1e1d29;
 }
 
-/* Organiza os dados da demanda em colunas que podem quebrar de linha. */
 .informacoes {
     display: flex;
     flex-wrap: wrap;
@@ -134,7 +153,6 @@ section p {
     font-size: 18px;
 }
 
-/* Destaca visualmente cada comentário. */
 .comentario {
     background-color: #1e1d29;
     padding: 15px;
@@ -158,7 +176,6 @@ section p {
     font-size: 18px;
 }
 
-/* Marca cada evento do histórico com uma linha lateral. */
 .alteracao {
     border-left: 3px solid #6d4aff;
     padding-left: 15px;
@@ -169,7 +186,12 @@ section p {
     font-size: 12px;
     margin-bottom: 6px;
 }
-/* Usa fonte monoespaçada para destacar o identificador da demanda. */
-.codigo {
-    font-family: "JetBrains Mono", monospace;
+
+footer {
+    background-color: #15141c;
+    border-top: 1px solid #2c2a3a;
+    color: #9a97ac;
+    font-size: 12px;
+    padding: 20px 24px;
+    text-align: center;
 }
