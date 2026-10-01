@@ -1,3 +1,4 @@
+// Componente original: Lucas Gomes Zacarias. Integração: Augusto Henrique Marçura.
 // Mantém os textos das demandas seguros ao montar a tabela de demonstração.
 const escaparHtml = valor => String(valor ?? "").replace(/[&<>"']/g, caractere => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
