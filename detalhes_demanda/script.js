@@ -1,6 +1,6 @@
 // Autor: Augusto Henrique Marçura.
-// Seleciona a demanda da URL e mantém a tela sincronizada com os dados de demonstração.
-import { buscarDemandaExemplo, salvarDemandaExemplo } from "../componentes/demandasExemplo.js";
+// Seleciona a demanda da URL e mantém a tela sincronizada com os dados locais.
+import { buscarDemandaExemplo, salvarDemandaExemplo } from "./demandasExemplo.js";
 
 const id = new URLSearchParams(window.location.search).get("id");
 let demanda = /^\d+$/.test(id ?? "") ? buscarDemandaExemplo(id) : null;
@@ -149,8 +149,4 @@ if (!demanda) {
         elemento("#botao-editar").focus();
     });
 
-    // O atalho Editar da listagem abre a mesma edição já ligada aos detalhes.
-    if (window.location.hash === "#editar") {
-        elemento("#botao-editar").click();
-    }
 }

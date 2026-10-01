@@ -1,5 +1,5 @@
 // Autor da integração: Augusto Henrique Marçura.
-// Dados de demonstração compartilhados pela listagem e pela tela de detalhes.
+// Dados de demonstração usados apenas pela tela de detalhes.
 const CHAVE_ARMAZENAMENTO = "nexo-demandas-exemplo-v1";
 
 const demandasIniciais = [
@@ -49,7 +49,7 @@ export function buscarDemandaExemplo(id) {
     return listarDemandasExemplo().find(demanda => String(demanda.id) === String(id)) ?? null;
 }
 
-// Persiste a edição para que detalhes e listagem mostrem os mesmos valores.
+// Persiste a edição somente na tela de detalhes deste navegador.
 export function salvarDemandaExemplo(demandaAtualizada) {
     const demandas = listarDemandasExemplo();
     const indice = demandas.findIndex(demanda => demanda.id === demandaAtualizada.id);
