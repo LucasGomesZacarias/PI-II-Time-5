@@ -1,3 +1,8 @@
+// Mantém os textos das demandas seguros ao montar a tabela de demonstração.
+const escaparHtml = valor => String(valor ?? "").replace(/[&<>"']/g, caractere => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[caractere]));
+
 export class ListaDemandas extends HTMLElement {
     constructor() {
         super();
@@ -47,7 +52,7 @@ export class ListaDemandas extends HTMLElement {
             .status.concluida { color: #34d399; }
             
             .acoes { white-space: nowrap; }
-            .btn-acao { margin-right: 10px; padding: 0; background: none; border: none; color: #8566ff; font-size: 14px; font-weight: bold; cursor: pointer; }
+            .btn-acao { margin-right: 10px; color: #8566ff; font-size: 14px; font-weight: bold; cursor: pointer; }
             .btn-acao:hover { color: #a48eff; text-decoration: underline; }
 
             .mensagem-vazia { text-align: center; color: #9a97ac; padding: 40px 0; font-size: 16px; }
@@ -78,24 +83,20 @@ export class ListaDemandas extends HTMLElement {
         const linhasTabela = this._demandas.map(demanda => `
             <tr>
                 <td>
-                    <a href="/detalhes_demanda/detalhesDemandas.html?id=${demanda.id}" class="titulo-demanda">
-                        ${demanda.codigo} - ${demanda.titulo}
+                    <a href="/detalhes_demanda/detalhesDemandas.html?id=${encodeURIComponent(demanda.id)}" class="titulo-demanda">
+                        ${escaparHtml(demanda.codigo)} - ${escaparHtml(demanda.titulo)}
                     </a>
                 </td>
-                <td>${demanda.projeto}</td>
-                <td>${demanda.tipo}</td>
-                <td><span class="tag ${demanda.classePrioridade}">${demanda.prioridade}</span></td>
-                <td><span class="status ${demanda.classeStatus}">${demanda.status}</span></td>
-                <td>${demanda.responsavel}</td>
-                <td>${demanda.dataCriacao}</td>
-                <td>${demanda.prazo}</td>
+                <td>${escaparHtml(demanda.projeto)}</td>
+                <td>${escaparHtml(demanda.tipo)}</td>
+                <td><span class="tag ${escaparHtml(demanda.classePrioridade)}">${escaparHtml(demanda.prioridade)}</span></td>
+                <td><span class="status ${escaparHtml(demanda.classeStatus)}">${escaparHtml(demanda.status)}</span></td>
+                <td>${escaparHtml(demanda.responsavel || "Não definido")}</td>
+                <td>${escaparHtml(demanda.dataCriacao)}</td>
+                <td>${escaparHtml(demanda.prazo || "Não definido")}</td>
                 <td class="acoes">
-                    <a href="/detalhes_demanda/detalhesDemandas.html?id=${demanda.id}">
-                        <button class="btn-acao" type="button">Detalhes</button>
-                    </a>
-                    <a href="/EdicaoDemanda/edicaoDemanda.html?id=${demanda.id}">
-                        <button class="btn-acao" type="button">Editar</button>
-                    </a>
+                    <a class="btn-acao" href="/detalhes_demanda/detalhesDemandas.html?id=${encodeURIComponent(demanda.id)}">Detalhes</a>
+                    <a class="btn-acao" href="/detalhes_demanda/detalhesDemandas.html?id=${encodeURIComponent(demanda.id)}#editar">Editar</a>
                 </td>
             </tr>
         `).join('');
