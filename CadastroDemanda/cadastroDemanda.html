@@ -1,4 +1,4 @@
-<!-- Autor: Felipe Evangelista Cruz-->
+<!-- Autor: Felipe Evangelista Cruz -->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -8,12 +8,20 @@
     <title>Nexo - Cadastro de Demanda</title>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
     <link rel="stylesheet" href="styleCadastroDemanda.css">
     <!-- JavaScript com as validações -->
     <script src="scriptCadastroDemanda.js" defer></script>
+    <!-- componente da barra de navegação -->
+    <script type="module" src="/componentes/libComps.js"></script>
 </head>
-<body> 
-    <header>
+<body>
+    <!-- barra de navegação -->
+    <comp-navbar pagina-atual="demandas"></comp-navbar>
+
+    <!-- título da página -->
+    <div class="titulo-secao">
         <div class="row">
             <div class="col-md-12">
                 <h2>Cadastro de Demanda</h2>
@@ -113,11 +121,13 @@
             </div>
 
 
-        <a href="#"><button type="button" id="cancelar">Cancelar</button></a>
-        <button type="submit">Cadastrar</button>
+            <!-- botões do formulário -->
+            <a href="/ListagemDemandas/ListagemDemandas.html"><button type="button" id="cancelar">Cancelar</button></a>
+            <button type="submit">Cadastrar</button>
         </form>
     </main>
 
+    <!-- rodapé -->
     <footer>
         <p>nexo. - Sistema de acompanhamento de demandas de desenvolvimento</p>
     </footer>

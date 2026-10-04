@@ -79,6 +79,7 @@ body {
     font-weight: bold;
 }
 
+/* título da página */
 .titulo-secao {
     background-color: #15141C;
     border-bottom: 1px solid #2C2A3A;
@@ -164,6 +165,7 @@ button:hover {
     background-color: #2C2A3A;
 }
 
+/* rodapé */
 footer {
     background-color: #15141C;
     border-top: 1px solid #2C2A3A;
@@ -173,7 +175,8 @@ footer {
     text-align: center;
 }
 
-p{
+/* textos das datas de criação e atualização */
+#containerCriacao p, #containerAtualizacao p {
     font-weight: bold;
     display: block;
     margin-top: 20px;
