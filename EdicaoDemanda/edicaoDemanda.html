@@ -1,13 +1,20 @@
+<!-- Autor: Felipe Evangelista Cruz -->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edição de Demanda</title>
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- CSS da tela -->
     <link rel="stylesheet" href="styleEdicaoDemanda.css">
+    <!-- JavaScript com as validações -->
+    <script src="scriptEdicaoDemanda.js" defer></script>
 </head>
 <body> 
+    <!-- cabeçalho da página -->
     <header>
         <div class="row">
             <div class="col-md-12">
@@ -19,7 +26,8 @@
     
 
     <main>
-        <form>
+        <!-- novalidate desliga a validação do navegador, a validação é feita pelo JavaScript -->
+        <form id="formEdicao" novalidate>
             <div class="row">
 
             <br><br>
@@ -28,12 +36,14 @@
             <br>
 
 
+            <!-- título da demanda -->
             <div id="containerTitulo" class="col-md-2">
                 <label for="titulo">Título:</label>
                 <input type="text" id="titulo" name="titulo" required>
                 <div id="erroTitulo" class="invalid-feedback"></div>
             </div>
 
+            <!-- tipo da demanda -->
             <div id="containerTipo" class="col-md-2">
                 <label for="tipo">Tipo:</label>
                 <select id="tipo" name="tipo" required>
@@ -46,6 +56,7 @@
                 <div id="erroTipo" class="invalid-feedback"></div>
             </div>
 
+            <!-- prioridade da demanda -->
             <div id="containerPrioridade" class="col-md-2">
                 <label for="prioridade">Prioridade:</label>
                 <select id="prioridade" name="prioridade" required>
@@ -59,6 +70,7 @@
 
             </div>
 
+            <!-- datas geradas automaticamente pelo sistema (só exibição) -->
             <div class="col-md-3" id="containerCriacao">
                 <p>Data de Criação: 00/00/0000</p>
             </div>
@@ -76,22 +88,28 @@
 
 
         <div class="row">
+            <!-- responsável (opcional) -->
             <div class="col-md-3" id="containerResponsavel">
                 <label for="responsavel">Responsável:</label>
                 <input type="text" id="responsavel" name="responsavel">
+                <div id="erroResponsavel" class="invalid-feedback"></div>
             </div>
 
+            <!-- projeto associado -->
              <div class="col-md-3" id="containerAssociado">
                 <label for="associado">Projeto Associado:</label>
                 <input type="text" id="associado" name="associado" required>
                 <div id="erroAssociado" class="invalid-feedback"></div>
             </div>
 
+            <!-- prazo de finalização (opcional) -->
              <div class="col-md-3" id="containerPrazo">
                 <label for="prazo">Prazo de Finalização:</label>
                 <input type="date" id="prazo" name="prazo">
+                <div id="erroPrazo" class="invalid-feedback"></div>
             </div>
 
+            <!-- status da demanda -->
             <div class="col-md-3" id="containerStatus">
                 <label for="status">Status:</label>
                 <select id="status" name="status" required>
@@ -112,6 +130,7 @@
 
 
         <div class="row">
+            <!-- descrição da demanda -->
             <div class="col-md-12" id="containerDescricao">
                 <label for="descricao">Descrição:</label>
                 <textarea id="descricao" name="descricao" required></textarea>
@@ -120,6 +139,7 @@
         </div>
 
 
+        <!-- botões do formulário -->
         <a href="#"><button type="button" id="cancelar">Cancelar</button></a>
         <button type="submit">Salvar</button>
         </form>
