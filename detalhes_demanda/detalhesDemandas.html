@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<!-- Tela de detalhes: Augusto Henrique Marçura. -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexo - Detalhes de Demanda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script type="module" src="/componentes/libComps.js"></script>
+    <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <comp-navbar pagina-atual="demandas"></comp-navbar>
+
+    <main>
+        <a href="/ListagemDemandas/ListagemDemandas.html">Voltar para demandas</a>
+        <p id="aviso-demanda" class="aviso" role="status" hidden></p>
+
+        <section id="detalhes" hidden>
+            <div class="cabecalho-demanda">
+                <div>
+                    <p id="codigo-demanda" class="codigo"></p>
+                    <h2 id="titulo-demanda"></h2>
+                </div>
+                <button id="botao-editar" class="botao" type="button">Editar demanda</button>
+            </div>
+
+            <div class="etiquetas">
+                <p id="status-demanda" class="status"></p>
+                <p id="prioridade-demanda" class="prioridade"></p>
+                <p id="tipo-demanda" class="tipo"></p>
+            </div>
+
+            <h3>Descrição</h3>
+            <p id="descricao-demanda" class="texto-longo"></p>
+
+            <div class="informacoes">
+                <div><h3>Projeto</h3><p id="projeto-demanda"></p></div>
+                <div><h3>Responsável</h3><p id="responsavel-demanda"></p></div>
+                <div><h3>Data de criação</h3><p id="criacao-demanda"></p></div>
+                <div><h3>Última atualização</h3><p id="atualizacao-demanda"></p></div>
+                <div><h3>Prazo de finalização</h3><p id="prazo-demanda"></p></div>
+            </div>
+
+            <!-- A edição altera somente os dados de demonstração deste navegador. -->
+            <form id="formulario-edicao" class="formulario-edicao" hidden>
+                <h3>Editar dados da demanda</h3>
+                <label for="titulo">Título</label>
+                <input id="titulo" name="titulo" type="text" maxlength="120" required>
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="5" required></textarea>
+                <label for="responsavel">Responsável</label>
+                <input id="responsavel" name="responsavel" type="text" maxlength="100">
+                <label for="prazo">Prazo de finalização</label>
+                <input id="prazo" name="prazo" type="date">
+                <p id="aviso-edicao" class="aviso" role="status" hidden></p>
+                <div class="acoes-edicao">
+                    <button class="botao" type="submit">Salvar alterações</button>
+                    <button id="botao-cancelar" class="botao botao-secundario" type="button">Descartar edição</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="secao-comentarios" class="comentarios" hidden>
+            <h3>Comentários</h3>
+            <div id="lista-comentarios"></div>
+        </section>
+
+        <section id="secao-historico" class="historico" hidden>
+            <h3>Histórico de alterações</h3>
+            <div id="lista-historico"></div>
+        </section>
+    </main>
+
+    <footer><p>nexo. - Sistema de acompanhamento de demandas de desenvolvimento</p></footer>
+</body>
+</html>

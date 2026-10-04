@@ -16,14 +16,13 @@ body {
     color: #EDECF3;
 }
 
-/* cabeçalho */
 header {
     background-color: #15141C;
     border-bottom: 1px solid #2C2A3A;
     padding: 20px;
 }
 
-header h2 {
+.titulo-secao h2 {
     font-family: 'JetBrains Mono', monospace;
     color: #EDECF3;
 }
@@ -100,4 +99,13 @@ button:hover {
 
 #cancelar:hover {
     background-color: #2C2A3A;
+}
+
+footer {
+    background-color: #15141C;
+    border-top: 1px solid #2C2A3A;
+    color: #9A97AC;
+    font-size: 12px;
+    padding: 20px 24px;
+    text-align: center;
 }

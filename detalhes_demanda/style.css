@@ -1,7 +1,12 @@
+/* Integração da tela de detalhes: Augusto Henrique Marçura. */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
 }
 
 body {
@@ -15,33 +20,59 @@ header {
     justify-content: space-between;
     align-items: center;
 
-    padding: 20px 40px;
+    padding: 16px 7%;
+    background-color: #15141c;
     border-bottom: 1px solid #2c2a3a;
 }
 
 header h1 {
     color: #edecf3;
-    font-size: 28px;
+    font-size: 30px;
+    font-weight: 800;
     font-family: "JetBrains Mono", monospace;
 }
 
 header h1 span {
-    color: #6d4aff;
+    color: #b3a3ff;
 }
 
-nav {
+.menu {
     display: flex;
-    gap: 30px;
+    gap: 8px;
 }
 
-nav a {
+.menu a {
     color: #9a97ac;
     text-decoration: none;
-    font-size: 16px;
+    padding: 9px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 
-nav a:hover {
+.menu a:hover,
+.menu .ativo {
+    background-color: #6d4aff;
     color: #edecf3;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.9rem;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #6d4aff;
+    color: #edecf3;
+    font-size: 0.75rem;
+    font-weight: bold;
 }
 
 main {
@@ -73,6 +104,88 @@ section h2 {
     margin-top: 8px;
     margin-bottom: 25px;
     font-family: "JetBrains Mono", monospace;
+}
+
+.cabecalho-demanda {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.codigo {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+}
+
+.texto-longo {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.botao {
+    padding: 11px 16px;
+    border: 1px solid #6d4aff;
+    border-radius: 5px;
+    background-color: #6d4aff;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.botao:hover,
+.botao:focus-visible {
+    background-color: #8566ff;
+}
+
+.botao-secundario {
+    background-color: transparent;
+    color: #edecf3;
+    border-color: #9a97ac;
+}
+
+.aviso {
+    margin-top: 20px;
+    color: #ff9f40;
+}
+
+.formulario-edicao {
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #2c2a3a;
+}
+
+.formulario-edicao h3 {
+    margin: 0 0 8px;
+}
+
+.formulario-edicao label {
+    font-size: 14px;
+}
+
+.formulario-edicao input,
+.formulario-edicao textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #514d68;
+    border-radius: 5px;
+    background-color: #1e1d29;
+    color: #edecf3;
+    font: inherit;
+}
+
+.formulario-edicao input:focus-visible,
+.formulario-edicao textarea:focus-visible {
+    outline: 2px solid #8566ff;
+}
+
+.acoes-edicao {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
 }
 
 section h3 {
@@ -159,4 +272,20 @@ section p {
 .alteracao .data {
     font-size: 12px;
     margin-bottom: 6px;
+}
+
+footer {
+    background-color: #15141c;
+    border-top: 1px solid #2c2a3a;
+    color: #9a97ac;
+    font-size: 12px;
+    padding: 20px 24px;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    main { padding: 24px 16px; }
+    .cabecalho-demanda { flex-direction: column; }
+    .informacoes div { width: 100%; }
+    .etiquetas { flex-wrap: wrap; }
 }

@@ -9,20 +9,26 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <!-- CSS da tela -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
     <link rel="stylesheet" href="styleEdicaoDemanda.css">
     <!-- JavaScript com as validações -->
     <script src="scriptEdicaoDemanda.js" defer></script>
+    <script type="module" src="/componentes/libComps.js"></script>
 </head>
-<body> 
+<body>
     <!-- cabeçalho da página -->
-    <header>
+
+
+    <comp-navbar pagina-atual="demandas"></comp-navbar>
+
+    <div class="titulo-secao">
         <div class="row">
             <div class="col-md-12">
                 <h2>Edição de Demanda</h2>
                 <br>
             </div>
         </div>
-    </header>
+    </div>
     
 
     <main>
@@ -140,9 +146,13 @@
 
 
         <!-- botões do formulário -->
-        <a href="#"><button type="button" id="cancelar">Cancelar</button></a>
+        <a href="/ListagemDemandas/ListagemDemandas.html"><button type="button" id="cancelar">Cancelar</button></a>
         <button type="submit">Salvar</button>
         </form>
     </main>
+
+    <footer>
+        <p>nexo. - Sistema de acompanhamento de demandas de desenvolvimento</p>
+    </footer>
 </body>
 </html>

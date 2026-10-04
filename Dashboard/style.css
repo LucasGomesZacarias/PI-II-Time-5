@@ -27,9 +27,13 @@ a {
 }
 
 .logo {
-  font-size: 1.25rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.logo span {
+  color: #b3a3ff;
 }
 
 .menu {
@@ -91,6 +95,7 @@ main {
 
 h1 {
   color: #edecf3;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 2rem;
   line-height: 1.2;
   margin-bottom: 10px;
@@ -189,6 +194,7 @@ h1 {
 
 .titulo-bloco h2 {
   color: #edecf3;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 1.15rem;
 }
 
@@ -308,9 +314,9 @@ h1 {
 
 footer {
   background-color: #15141c;
-  border: 1px solid #2c2a3a;
+  border-top: 1px solid #2c2a3a;
   color: #9a97ac;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   padding: 20px 24px;
   text-align: center;
 }
