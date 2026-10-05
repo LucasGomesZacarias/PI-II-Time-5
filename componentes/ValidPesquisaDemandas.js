@@ -1,3 +1,4 @@
+//<!-- Lucas Gomes Zacarias - RA 26003288 -->
 export function iniciarValidacaoFiltros(raizDoComponente) {
 
     const formFiltros = raizDoComponente.querySelector('.filtros');
