@@ -14,6 +14,83 @@ function mostrarAviso(mensagem) {
     avisoEdicao.hidden = !mensagem;
 }
 
+// Guarda cada campo e a mensagem usada para exibir erros individualmente.
+const camposEdicao = [
+    { seletor: "#titulo", erro: "#erro-titulo" },
+    { seletor: "#descricao", erro: "#erro-descricao" },
+    { seletor: "#responsavel", erro: "#erro-responsavel" },
+    { seletor: "#prazo", erro: "#erro-prazo" }
+];
+
+function limparErros() {
+    for (const campo of camposEdicao) {
+        const entrada = elemento(campo.seletor);
+        entrada.classList.remove("is-invalid");
+        entrada.removeAttribute("aria-invalid");
+        elemento(campo.erro).textContent = "";
+    }
+}
+
+function mostrarErro(campo, mensagem) {
+    const entrada = elemento(campo.seletor);
+    entrada.classList.add("is-invalid");
+    entrada.setAttribute("aria-invalid", "true");
+    elemento(campo.erro).textContent = mensagem;
+}
+
+// Valida todos os campos e bloqueia o salvamento se encontrar algum erro.
+function validarCampos() {
+    limparErros();
+    let valido = true;
+
+    const titulo = elemento("#titulo").value.trim();
+    if (!titulo) {
+        mostrarErro(camposEdicao[0], "O título é obrigatório.");
+        valido = false;
+    } else if (titulo.length < 2 || titulo.length > 100) {
+        mostrarErro(camposEdicao[0], "O título deve ter entre 2 e 100 caracteres.");
+        valido = false;
+    }
+
+    const descricao = elemento("#descricao").value.trim();
+    if (!descricao) {
+        mostrarErro(camposEdicao[1], "A descrição é obrigatória.");
+        valido = false;
+    } else if (descricao.length < 10 || descricao.length > 500) {
+        mostrarErro(camposEdicao[1], "A descrição deve ter entre 10 e 500 caracteres.");
+        valido = false;
+    }
+
+    const responsavel = elemento("#responsavel").value.trim();
+    if (responsavel.length > 100) {
+        mostrarErro(camposEdicao[2], "O responsável deve ter no máximo 100 caracteres.");
+        valido = false;
+    }
+
+    const prazo = elemento("#prazo").value;
+    if (prazo) {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const dataPrazo = new Date(`${prazo}T00:00:00`);
+        if (Number.isNaN(dataPrazo.getTime())) {
+            mostrarErro(camposEdicao[3], "Informe um prazo válido.");
+            valido = false;
+        } else if (dataPrazo < hoje) {
+            mostrarErro(camposEdicao[3], "O prazo não pode ser uma data passada.");
+            valido = false;
+        }
+    }
+
+    if (!valido) {
+        const primeiroCampoInvalido = camposEdicao.find(campo =>
+            elemento(campo.seletor).classList.contains("is-invalid")
+        );
+        elemento(primeiroCampoInvalido.seletor).focus();
+    }
+
+    return valido;
+}
+
 function dataParaCampo(data) {
     if (!data) return "";
     const [dia, mes, ano] = data.split("/");
@@ -103,12 +180,10 @@ if (!demanda) {
 
     formulario.addEventListener("submit", evento => {
         evento.preventDefault();
+        if (!validarCampos()) return;
+
         const titulo = elemento("#titulo").value.trim();
         const descricao = elemento("#descricao").value.trim();
-        if (!titulo || !descricao) {
-            mostrarAviso("Preencha o título e a descrição.");
-            return;
-        }
 
         const agora = new Date();
         const alteracoes = {

@@ -181,6 +181,21 @@ section h2 {
     outline: 2px solid #8566ff;
 }
 
+.formulario-edicao .is-invalid {
+    border-color: #ff7272;
+}
+
+.formulario-edicao .invalid-feedback {
+    display: none;
+    margin: -6px 0 2px;
+    color: #ff9b9b;
+    font-size: 13px;
+}
+
+.formulario-edicao .invalid-feedback:not(:empty) {
+    display: block;
+}
+
 .acoes-edicao {
     display: flex;
     flex-wrap: wrap;

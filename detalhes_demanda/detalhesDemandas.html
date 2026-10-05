@@ -46,16 +46,20 @@
             </div>
 
             <!-- A edição altera somente os dados de demonstração deste navegador. -->
-            <form id="formulario-edicao" class="formulario-edicao" hidden>
+            <form id="formulario-edicao" class="formulario-edicao" novalidate hidden>
                 <h3>Editar dados da demanda</h3>
                 <label for="titulo">Título</label>
-                <input id="titulo" name="titulo" type="text" maxlength="120" required>
+                <input id="titulo" name="titulo" type="text" maxlength="100" aria-describedby="erro-titulo" required>
+                <p id="erro-titulo" class="invalid-feedback" aria-live="polite"></p>
                 <label for="descricao">Descrição</label>
-                <textarea id="descricao" name="descricao" rows="5" required></textarea>
-                <label for="responsavel">Responsável</label>
+                <textarea id="descricao" name="descricao" rows="5" maxlength="500" aria-describedby="erro-descricao" required></textarea>
+                <p id="erro-descricao" class="invalid-feedback" aria-live="polite"></p>
+                <label for="responsavel">Responsável (opcional)</label>
                 <input id="responsavel" name="responsavel" type="text" maxlength="100">
-                <label for="prazo">Prazo de finalização</label>
-                <input id="prazo" name="prazo" type="date">
+                <p id="erro-responsavel" class="invalid-feedback" aria-live="polite"></p>
+                <label for="prazo">Prazo de finalização (opcional)</label>
+                <input id="prazo" name="prazo" type="date" aria-describedby="erro-prazo">
+                <p id="erro-prazo" class="invalid-feedback" aria-live="polite"></p>
                 <p id="aviso-edicao" class="aviso" role="status" hidden></p>
                 <div class="acoes-edicao">
                     <button class="botao" type="submit">Salvar alterações</button>
