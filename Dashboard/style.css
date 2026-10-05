@@ -1,4 +1,5 @@
-/* Dashboard desenvolvido com HTML e CSS puros. */
+/* Autor: Gabriel Grigoletto Ribas. Estilos do Dashboard Nexo. */
+/* Configuração geral e cores da identidade visual do projeto. */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -16,6 +17,7 @@ a {
   text-decoration: none;
 }
 
+/* Cabeçalho da tela; a barra visível é criada pelo componente da equipe. */
 .cabecalho {
   align-items: center;
   background-color: #15141c;
@@ -72,6 +74,7 @@ a {
   width: 32px;
 }
 
+/* Área principal, apresentação e botão de atalho. */
 main {
   margin: 0 auto;
   max-width: 1240px;
@@ -119,6 +122,7 @@ h1 {
   background-color: #8566ff;
 }
 
+/* Cards que apresentam as quantidades de demandas por status. */
 .resumo {
   display: flex;
   flex-wrap: wrap;
@@ -163,6 +167,7 @@ h1 {
 .concluida { border: 2px solid #34d399; }
 .cancelada { border: 2px solid #8d899c; }
 
+/* Organização dos painéis de distribuição e das listas de atenção. */
 .painel,
 .demandas-importantes {
   display: flex;
@@ -208,6 +213,7 @@ h1 {
   text-decoration: underline;
 }
 
+/* Barras que comparam as quantidades de demandas por prioridade. */
 .linha-prioridade {
   align-items: center;
   display: flex;
@@ -259,6 +265,7 @@ h1 {
 .media-barra { background-color: #ffd166; width: 100%; }
 .baixa-barra { background-color: #8b98a8; width: 60%; }
 
+/* Contagem das demandas por tipo. */
 .lista-tipos {
   border: 1px solid #2c2a3a;
 }
@@ -276,6 +283,57 @@ h1 {
 
 .alerta { color: #ff5470; }
 
+/* Formulário e mensagens da busca nas demandas críticas. */
+.busca-demanda {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.campo-busca {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 6px;
+}
+
+.campo-busca label {
+  color: #9a97ac;
+  font-size: 0.8rem;
+}
+
+.campo-busca input {
+  background-color: #1e1d29;
+  border: 1px solid #2c2a3a;
+  border-radius: 4px;
+  color: #edecf3;
+  padding: 9px;
+}
+
+.botao-busca,
+.botao-limpar {
+  border: 0;
+  border-radius: 4px;
+  color: #edecf3;
+  padding: 9px 14px;
+}
+
+.botao-busca { background-color: #6d4aff; }
+.botao-limpar { background-color: #2c2a3a; }
+.botao-busca:hover { background-color: #8566ff; }
+
+.mensagem-busca {
+  color: #9a97ac;
+  font-size: 0.82rem;
+}
+
+.mensagem-busca.erro-busca { color: #ff5470; }
+
+/* A busca esconde apenas as linhas que não correspondem ao termo válido. */
+.tabela-demandas .linha-oculta { display: none; }
+
 .tabela-demandas {
   font-size: 0.83rem;
   margin-bottom: 0;
@@ -292,6 +350,7 @@ h1 {
 
 .critica-tag { background-color: #3a1e2a; color: #ff5470; }
 
+/* Lista das demandas com prazo de conclusão próximo. */
 .lista-prazos { list-style: none; }
 
 .lista-prazos li {
@@ -312,6 +371,7 @@ h1 {
 .lista-prazos span { color: #9a97ac; font-size: 0.75rem; }
 .data-prazo { color: #ffd166; font-size: 0.78rem; font-weight: bold; }
 
+/* Rodapé da página. */
 footer {
   background-color: #15141c;
   border-top: 1px solid #2c2a3a;
@@ -321,6 +381,7 @@ footer {
   text-align: center;
 }
 
+/* Ajustes de layout para telas menores. */
 @media (max-width: 768px) {
   .cabecalho,
   .apresentacao { align-items: flex-start; flex-direction: column; }
@@ -334,8 +395,11 @@ footer {
   .tabela-bloco,
   .tipos,
   .prazos { width: 100%; }
+
+  .busca-demanda { align-items: stretch; flex-direction: column; }
 }
 
+/* Ajustes adicionais para celulares estreitos. */
 @media (max-width: 480px) {
   .menu { gap: 2px; width: 100%; }
   .menu a { font-size: 0.78rem; padding: 8px; }

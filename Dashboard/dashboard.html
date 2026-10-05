@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Autor: Gabriel Grigoletto Ribas. Dashboard do sistema Nexo. -->
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -10,13 +11,17 @@
   >
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
+  <!-- Executa a busca e a validação após carregar os elementos da página. -->
+  <script src="script.js" defer></script>
   <script type="module" src="/componentes/libComps.js"></script>
 </head>
 <body>
 
+  <!-- Componente de navegação compartilhado com as outras telas da equipe. -->
   <comp-navbar pagina-atual="dashboard"></comp-navbar>
 
   <main id="inicio">
+    <!-- Apresentação do painel e atalho para as demandas importantes. -->
     <div class="apresentacao">
       <div>
         <p class="saudacao">Visão geral</p>
@@ -29,6 +34,7 @@
       <a class="botao" href="#demandas">Ver demandas</a>
     </div>
 
+    <!-- Contagem por status. Os números ainda são exemplos estáticos. -->
     <div class="resumo">
       <div class="card-resumo total">
         <p>Total de demandas</p>
@@ -67,6 +73,7 @@
       </div>
     </div>
 
+    <!-- Distribuição das demandas por prioridade e por tipo. -->
     <div class="painel">
       <div class="bloco distribuicao" id="projetos">
         <div class="titulo-bloco">
@@ -122,6 +129,7 @@
       </div>
     </div>
 
+    <!-- Demandas que exigem atenção: críticas abertas e prazos próximos. -->
     <div class="demandas-importantes" id="demandas">
       <div class="bloco tabela-bloco">
         <div class="titulo-bloco">
@@ -132,8 +140,20 @@
           <a href="#demandas">Ver todas</a>
         </div>
 
-        <div>
-          <table class="table table-dark table-striped table-hover align-middle tabela-demandas">
+        <!-- Busca local por código ou título nas demandas críticas mostradas abaixo. -->
+        <form id="formBuscaDemanda" class="busca-demanda">
+          <div class="campo-busca">
+            <label for="buscaDemanda">Buscar demanda crítica</label>
+            <input id="buscaDemanda" type="text" placeholder="Código ou título da demanda">
+          </div>
+          <button class="botao-busca" type="submit">Buscar</button>
+          <button class="botao-limpar" id="limparBusca" type="button">Limpar</button>
+        </form>
+        <p id="mensagemBusca" class="mensagem-busca"></p>
+
+        <!-- O JavaScript mostra ou esconde linhas desta tabela após validar a busca. -->
+        <div class="table-responsive">
+          <table id="tabelaDemandas" class="table table-dark table-striped table-hover align-middle tabela-demandas">
             <thead class="table-dark">
               <tr>
                 <th>Demanda</th>
@@ -186,6 +206,7 @@
     </div>
   </main>
 
+  <!-- Rodapé com o nome e a finalidade do sistema. -->
   <footer>
     <p>nexo. - Sistema de acompanhamento de demandas de desenvolvimento</p>
   </footer>
