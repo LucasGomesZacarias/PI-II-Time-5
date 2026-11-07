@@ -1,4 +1,4 @@
-<!-- Autor: Felipe Evangelista Cruz -->
+<!-- Autor: Felipe Evangelista Cruz e Augusto Henrique Marçura -->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
     <link rel="stylesheet" href="styleEdicaoDemanda.css">
     <!-- JavaScript com as validações -->
-    <script src="scriptEdicaoDemanda.js" defer></script>
+    <script type="module" src="scriptEdicaoDemanda.js"></script>
     <script type="module" src="/componentes/libComps.js"></script>
 </head>
 <body>
@@ -32,6 +32,10 @@
     
 
     <main>
+
+        <!-- informa quando a demanda não foi encontrada -->
+         <p id="avisoDemanda" role="alert" hidden></p>
+
         <!-- novalidate desliga a validação do navegador, a validação é feita pelo JavaScript -->
         <form id="formEdicao" novalidate>
             <div class="row">
@@ -78,11 +82,11 @@
 
             <!-- datas geradas automaticamente pelo sistema (só exibição) -->
             <div class="col-md-3" id="containerCriacao">
-                <p>Data de Criação: 00/00/0000</p>
+                <p>Data de Criação: <span id="dataCriacao"></span></p>
             </div>
 
             <div class="col-md-3" id="containerAtualizacao">
-                <p>Data de Atualização: 00/00/0000</p>
+                <p>Data de atualização: <span id="dataAtualizada"></span></p>
             </div>
         </div>
 
