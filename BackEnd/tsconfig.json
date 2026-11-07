@@ -13,7 +13,7 @@
   "compileOnSave": true,
   "include": [
     "src/**/*"
-  ],
+, "src/db.ts"  ],
   "exclude": [
     "**/*.spec.ts"
   ]
