@@ -50,7 +50,17 @@ export async function prepararEdicao(atual: DemandaEditavel, entrada: DemandaEdi
         catch { throw new ErroEdicao(503, "Não foi possível verificar os feriados nacionais."); }
         if (feriado) throw new ErroEdicao(400, `Prazo cai em feriado nacional: ${feriado}.`);
     }
-    const demanda = {...entrada, titulo: entrada.titulo.trim(), descricao: entrada.descricao.trim()};
+    // Devolve somente os campos editáveis, mesmo se o JSON contiver propriedades extras.
+    const demanda: DemandaEditavel = {
+        titulo: entrada.titulo.trim(),
+        descricao: entrada.descricao.trim(),
+        tipo: entrada.tipo,
+        prioridade: entrada.prioridade,
+        projetoId: entrada.projetoId,
+        responsavelId: entrada.responsavelId,
+        prazo: entrada.prazo,
+        status: entrada.status
+    };
     const historico: Alteracao[] = campos.filter(campo => atual[campo] !== demanda[campo]).map(campo => ({
         campo, anterior: atual[campo], novo: demanda[campo], usuarioId
     }));

@@ -15,3 +15,9 @@ test('valida transições, entidades e prazos',async()=>{
  await assert.rejects(prepararEdicao(atual,atual,0,deps),{status:401});
  await assert.rejects(prepararEdicao(atual,{...atual,prazo:'2027-01-02'},1,{...deps,feriadoNacional:async()=>{throw Error('fora do ar')}}),{status:503});
 });
+test('dados extras recebidos não são incluídos na demanda atualizada',async()=>{
+ const r=await edicao({titulo:'Título válido', usuarioId:999, privilegio:'administrador'});
+ assert.equal('usuarioId' in r.demanda,false);
+ assert.equal('privilegio' in r.demanda,false);
+ assert.equal(r.historico[0].usuarioId,1);
+});
