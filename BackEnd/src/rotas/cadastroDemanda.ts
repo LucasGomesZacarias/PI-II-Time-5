@@ -1,6 +1,7 @@
 // Autor: Felipe Evangelista Cruz
 import { Express, Request, Response } from "express";
 import { getConn } from "../db";
+import { buscarFeriadoNacional } from "../feriados";
 
 // cadastra as rotas da tela de cadastro de demanda no app do servidor
 export function rotasCadastroDemanda(app: Express) {
@@ -64,15 +65,28 @@ export function rotasCadastroDemanda(app: Express) {
         // o prazo é opcional, mas se for informado precisa estar no formato AAAA-MM-DD e ser uma data válida
         let prazoDemanda = null;
 
-        if (prazo) {
-            const dataPrazo = new Date(prazo + "T00:00:00");
-            const formatoCorreto = /^\d{4}-\d{2}-\d{2}$/.test(prazo);
+            if (prazo) {
+                const dataPrazo = new Date(prazo + "T00:00:00");
+                const formatoCorreto = /^\d{4}-\d{2}-\d{2}$/.test(prazo);
 
-            if (!formatoCorreto || Number.isNaN(dataPrazo.getTime())) {
-                return res.status(400).json({ mensagem: "Prazo inválido. Use o formato AAAA-MM-DD" });
-            }
+                if (!formatoCorreto || Number.isNaN(dataPrazo.getTime())) {
+                    return res.status(400).json({ mensagem: "Prazo inválido. Use o formato AAAA-MM-DD" });
+                }
 
-            prazoDemanda = prazo;
+                // confere na API externa se o prazo cai em feriado nacional
+                try {
+                    const feriado = await buscarFeriadoNacional(prazo);
+
+                    if (feriado) {
+                        return res.status(400).json({ mensagem: "O prazo não pode ser feriado nacional (" + feriado + ")." });
+                    }
+                } catch (erro) {
+                    // não conseguiu falar com a API de feriados
+                    console.error(erro);
+                    return res.status(503).json({ mensagem: "Não foi possível verificar se o prazo é feriado. Tente novamente em instantes." });
+                }
+
+                prazoDemanda = prazo;
         }
 
         let conn;
