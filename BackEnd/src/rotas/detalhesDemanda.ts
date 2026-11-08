@@ -4,14 +4,21 @@ import { Express } from "express";
 import { getConn } from "../db";
 import { demandasTeste, comentarioTeste, usuariosTeste } from "../dados/dadosTeste";
 
+// IDs das rotas devem conter somente dígitos decimais e representar inteiros positivos.
+function lerId(valor: string): number | null {
+    if (!/^\d+$/.test(valor)) return null;
+    const id = Number(valor);
+    return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
 //Reúne as rotas responsáveis pelos detalhes da demanda
 export function rotasDetalhesDemanda(app: Express) {
 
     // Busca uma demanda pelo identificador
     app.get("/demandas/:id", async (req, res) => {
-        const id = Number(req.params.id);
+        const id = lerId(req.params.id);
 
-        if (!Number.isSafeInteger(id) || id <= 0) {
+        if (id === null) {
             return res.status(400).json({ mensagem: "ID inválido"});
         }
 
@@ -56,9 +63,9 @@ export function rotasDetalhesDemanda(app: Express) {
 
     // Lista os comentários de uma demanda no modo de teste
     app.get("/demandas/:id/comentarios", (req, res) => {
-        const id = Number(req.params.id);
+        const id = lerId(req.params.id);
 
-        if (!Number.isSafeInteger(id) || id <= 0) {
+        if (id === null) {
             return res.status(400).json({ mensagem: "ID inválido"});
         }
 
@@ -85,10 +92,10 @@ export function rotasDetalhesDemanda(app: Express) {
 
    // Registra um comentário em memória para testes.
     app.post("/demandas/:id/comentarios", (req, res) => {
-        const demandaId = Number(req.params.id);
+        const demandaId = lerId(req.params.id);
         const { usuarioId, texto } = req.body ?? {};
 
-        if (!Number.isSafeInteger(demandaId) || demandaId <= 0) {
+        if (demandaId === null) {
             return res.status(400).json({ mensagem: "ID da demanda inválido." });
         }
 
