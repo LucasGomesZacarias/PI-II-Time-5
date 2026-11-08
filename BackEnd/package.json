@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.13",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.4",
     "@types/oracledb": "^26.0.1",
