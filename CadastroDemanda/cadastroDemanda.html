@@ -87,14 +87,18 @@
                 <!-- responsável (opcional) -->
                 <div class="col-md-3" id="containerResponsavel">
                     <label for="responsavel">Responsável:</label>
-                    <input type="text" id="responsavel" name="responsavel">
+                    <select id="responsavel" name="responsavel">
+                        <option value="">Sem responsável</option>
+                    </select>
                     <div id="erroResponsavel" class="invalid-feedback"></div>
                 </div>
 
                 <!-- projeto associado -->
                 <div class="col-md-3" id="containerAssociado">
                     <label for="associado">Projeto Associado:</label>
-                    <input type="text" id="associado" name="associado" required>
+                    <select id="associado" name="associado" required>
+                        <option value=""></option>
+                    </select>
                     <div id="erroAssociado" class="invalid-feedback"></div>
                 </div>
 
@@ -121,9 +125,12 @@
             </div>
 
 
+            <!-- mensagem de sucesso ou de erro devolvida pela API -->
+            <div id="areaMensagem"></div>
+
             <!-- botões do formulário -->
             <a href="/ListagemDemandas/ListagemDemandas.html"><button type="button" id="cancelar">Cancelar</button></a>
-            <button type="submit">Cadastrar</button>
+            <button type="submit" id="botaoCadastrar">Cadastrar</button>
         </form>
     </main>
 

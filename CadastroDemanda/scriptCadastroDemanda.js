@@ -21,6 +21,15 @@ const erroAssociado = document.querySelector("#erroAssociado");
 const erroPrazo = document.querySelector("#erroPrazo");
 const erroDescricao = document.querySelector("#erroDescricao");
 
+// pega a div onde a mensagem de sucesso ou de erro da API vai aparecer
+const areaMensagem = document.querySelector("#areaMensagem");
+
+// pega o botão de cadastrar (usado para evitar clique duplo)
+const botaoCadastrar = document.querySelector("#botaoCadastrar");
+
+// endereço onde a API está rodando
+const API_BASE_URL = "http://localhost:3000";
+
 
 // lista com todos os campos, usada para limpar o estilo de erro
 const camposComErro = [
@@ -59,11 +68,107 @@ function limparErros() {
     mensagensDeErro.forEach(function (elementoErro) {
         elementoErro.innerText = "";
     });
+
+    // apaga também a mensagem da API do envio anterior
+    areaMensagem.className = "";
+    areaMensagem.innerText = "";
+}
+
+// mostra a mensagem da API (tipo: success ou danger, são as cores do Bootstrap)
+function exibirMensagem(tipo, mensagem) {
+    areaMensagem.className = "alert alert-" + tipo;
+    areaMensagem.innerText = mensagem;
+}
+
+// lê a resposta da API e gera um erro com a mensagem dela quando o status não é de sucesso
+async function tratarRespostaApi(resposta) {
+    let dados = {};
+
+    try {
+        dados = await resposta.json();
+    } catch (erro) {
+        // a resposta não veio em JSON
+        dados = {};
+    }
+
+    if (!resposta.ok) {
+        throw new Error(dados.mensagem || "Erro ao realizar a requisição.");
+    }
+
+    return dados;
+}
+
+// faz o fetch na API e devolve a resposta já tratada
+async function chamarApi(url, opcoes) {
+    let resposta;
+
+    try {
+        resposta = await fetch(url, opcoes);
+    } catch (erro) {
+        // cai aqui quando o servidor está desligado ou não responde
+        throw new Error("Não foi possível conectar com o servidor.");
+    }
+
+    return await tratarRespostaApi(resposta);
+}
+
+// GET /projetos
+async function listarProjetosApi() {
+    return await chamarApi(API_BASE_URL + "/projetos");
+}
+
+// GET /usuarios
+async function listarUsuariosApi() {
+    return await chamarApi(API_BASE_URL + "/usuarios");
+}
+
+// POST /demandas
+async function cadastrarDemandaApi(demanda) {
+    return await chamarApi(API_BASE_URL + "/demandas", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(demanda)
+    });
+}
+
+// coloca os projetos do banco na lista de projeto associado
+async function carregarProjetos() {
+    try {
+        const projetos = await listarProjetosApi();
+
+        projetos.forEach(function (projeto) {
+            const opcao = document.createElement("option");
+            opcao.value = projeto.id;
+            opcao.innerText = projeto.nome;
+            campoAssociado.appendChild(opcao);
+        });
+    } catch (erro) {
+        exibirMensagem("danger", "Não foi possível carregar os projetos: " + erro.message);
+    }
+}
+
+// coloca os usuários do banco na lista de responsável
+async function carregarResponsaveis() {
+    try {
+        const usuarios = await listarUsuariosApi();
+
+        usuarios.forEach(function (usuario) {
+            const opcao = document.createElement("option");
+            opcao.value = usuario.id;
+            opcao.innerText = usuario.nome;
+            campoResponsavel.appendChild(opcao);
+        });
+    } catch (erro) {
+        // o responsável é opcional, então se a lista não carregar o formulário continua funcionando
+        console.error(erro);
+    }
 }
 
 
 // executa quando o usuário clica em Cadastrar
-formulario.addEventListener("submit", function (event) {
+formulario.addEventListener("submit", async function (event) {
     // impede o envio automático do formulário
     event.preventDefault();
     limparErros();
@@ -136,8 +241,40 @@ formulario.addEventListener("submit", function (event) {
         formValido = false;
     }
 
-    
-    // if (formValido) {
-    //
-    // }
+
+    // se achou algum erro, não envia para a API
+    if (!formValido) {
+        return;
+    }
+
+    // desliga o botão enquanto envia, para não cadastrar duas vezes
+    botaoCadastrar.disabled = true;
+
+    try {
+        // monta o objeto com os dados que a API espera
+        const demanda = {
+            titulo: titulo,
+            descricao: descricao,
+            tipo: tipo,
+            prioridade: prioridade,
+            projetoId: associado,
+            responsavelId: responsavel,
+            prazo: prazo
+        };
+
+        const resposta = await cadastrarDemandaApi(demanda);
+
+        // deu certo: mostra a mensagem e limpa o formulário
+        exibirMensagem("success", resposta.mensagem);
+        formulario.reset();
+    } catch (erro) {
+        // deu erro na API: mostra a mensagem para o usuário
+        exibirMensagem("danger", erro.message);
+    } finally {
+        botaoCadastrar.disabled = false;
+    }
 });
+
+// carrega as listas de projeto e de responsável quando a página abre
+carregarProjetos();
+carregarResponsaveis();
