@@ -5,6 +5,7 @@
     box-sizing: border-box;
 }
 
+/* Mantém ocultos os elementos que ainda não devem aparecer */
 [hidden] {
     display: none !important;
 }
@@ -149,6 +150,7 @@ section h2 {
     color: #ff9f40;
 }
 
+/* Organiza os campos e as ações do formulário de edição */
 .formulario-edicao {
     display: grid;
     gap: 10px;

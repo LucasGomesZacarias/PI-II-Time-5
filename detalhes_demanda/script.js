@@ -2,6 +2,7 @@
 // Seleciona a demanda da URL e mantém a tela sincronizada com os dados locais.
 import { buscarDemandaExemplo, salvarDemandaExemplo } from "./demandasExemplo.js";
 
+// Lê o ID no endereço e procura a demanda entre os dados de exemplo
 const id = new URLSearchParams(window.location.search).get("id");
 let demanda = /^\d+$/.test(id ?? "") ? buscarDemandaExemplo(id) : null;
 
@@ -22,6 +23,7 @@ const camposEdicao = [
     { seletor: "#prazo", erro: "#erro-prazo" }
 ];
 
+// Remove as mensagens e os destaques da tentativa anterior
 function limparErros() {
     for (const campo of camposEdicao) {
         const entrada = elemento(campo.seletor);
@@ -31,6 +33,7 @@ function limparErros() {
     }
 }
 
+// Destaca o campo inválido e exibe uma mensagem para o usuário
 function mostrarErro(campo, mensagem) {
     const entrada = elemento(campo.seletor);
     entrada.classList.add("is-invalid");
@@ -91,12 +94,14 @@ function validarCampos() {
     return valido;
 }
 
+// Converte a data de dia/mês/ano para o formato do campo de data
 function dataParaCampo(data) {
     if (!data) return "";
     const [dia, mes, ano] = data.split("/");
     return `${ano}-${mes}-${dia}`;
 }
 
+// Converte a data do formulário para dia/mês/ano
 function dataParaTela(data) {
     if (!data) return "Não definido";
     const [ano, mes, dia] = data.split("-");
@@ -126,6 +131,7 @@ function preencherRegistros(container, registros, classe, campos) {
     }
 }
 
+// Preenche a tela com os dados, comentários e histórico da demanda
 function renderizar() {
     const campos = {
         "#codigo-demanda": demanda.codigo,
@@ -152,6 +158,7 @@ function renderizar() {
     ]);
 }
 
+// Mostra um aviso se o ID não corresponder a uma demanda de exemplo
 if (!demanda) {
     const aviso = elemento("#aviso-demanda");
     aviso.textContent = "Demanda não encontrada. Volte à listagem e escolha uma demanda válida.";
@@ -162,6 +169,24 @@ if (!demanda) {
     }
     renderizar();
 
+    // Valida o comentário antes de permitir o envio
+    elemento("#formulario-comentario").addEventListener("submit", evento => {
+        evento.preventDefault();
+
+        const campoComentario = elemento("#texto-comentario");
+        const mensagem = elemento("#erro-comentario");
+        const texto = campoComentario.value.trim();
+
+        if (!texto) {
+            mensagem.textContent = "Escreva um comentário antes de enviar";
+            campoComentario.focus();
+            return;
+        }
+
+        mensagem.textContent = "Comentário válido. O envio será integrado à API";
+    });
+
+    // Abre o formulário preenchido com os dados atuais da demanda
     elemento("#botao-editar").addEventListener("click", () => {
         elemento("#titulo").value = demanda.titulo;
         elemento("#descricao").value = demanda.descricao;
@@ -178,6 +203,7 @@ if (!demanda) {
         elemento("#botao-editar").focus();
     });
 
+    // Valida e salva a edição nos dados de demonstração do navegador
     formulario.addEventListener("submit", evento => {
         evento.preventDefault();
         if (!validarCampos()) return;
@@ -192,7 +218,10 @@ if (!demanda) {
             responsavel: elemento("#responsavel").value.trim(),
             prazo: dataParaTela(elemento("#prazo").value)
         };
+
         if (!elemento("#prazo").value) alteracoes.prazo = "";
+        
+        // Identifica os campos que mudaram para registrar o histórico local
         const camposAlterados = Object.entries(alteracoes)
             .filter(([campo, valor]) => demanda[campo] !== valor)
             .map(([campo]) => ({ titulo: "título", descricao: "descrição", responsavel: "responsável", prazo: "prazo" })[campo]);
@@ -213,6 +242,8 @@ if (!demanda) {
                 { data: `${data} - ${hora}`, texto: `Campos alterados na demonstração local: ${camposAlterados.join(", ")}.` }
             ]
         };
+
+        // Tenta salvar no navegador e avisa se o armazenamento falhar
         if (!salvarDemandaExemplo(atualizada)) {
             mostrarAviso("Não foi possível salvar neste navegador. Verifique o armazenamento local.");
             return;

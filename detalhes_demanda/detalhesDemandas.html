@@ -71,6 +71,23 @@
         <section id="secao-comentarios" class="comentarios" hidden>
             <h3>Comentários</h3>
             <div id="lista-comentarios"></div>
+
+            <!-- Formulário para escrever um comentário na demanda -->
+             <form id="formulario-comentario" novalidate>
+                <label for="texto-comentario">Novo comentário</label>
+                <textarea
+                    id="texto-comentario"
+                    name="comentario"
+                    rows="3"
+                    required
+                    aria-describedby="erro-comentario"
+                    ></textarea>
+
+                    <p id="erro-comentario" role="alert"></p>
+
+                    <button class="botao" type="submit">Adicionar comentário</button>
+             </form>
+             
         </section>
 
         <section id="secao-historico" class="historico" hidden>
