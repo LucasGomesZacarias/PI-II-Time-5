@@ -23,6 +23,7 @@ test('detalhes: demanda existente, inexistente e identificador inválido', async
     assert.equal(r.status, 200); assert.equal(r.dados.id, 1041); assert.ok(r.dados.descricao);
     assert.equal((await chamar('/demandas/99999')).status, 404);
     assert.equal((await chamar('/demandas/abc')).status, 400);
+    assert.equal((await chamar('/demandas/1e3')).status, 400);
 });
 test('comentários vinculados à demanda e usuário e validados no servidor', async () => {
     assert.equal((await chamar('/demandas/99999/comentarios')).status, 404);
@@ -35,4 +36,12 @@ test('comentários vinculados à demanda e usuário e validados no servidor', as
     assert.ok(!Number.isNaN(Date.parse(r.dados.dataHora)));
     r = await chamar('/demandas/1041/comentarios');
     assert.equal(r.status, 200); assert.equal(r.dados.length, 1); assert.equal(r.dados[0].usuarioId, 1);
+});
+test('JSON inválido retorna um erro em JSON', async () => {
+    await pronto;
+    const resposta = await fetch(`http://127.0.0.1:${port}/demandas/1041/comentarios`, {
+        method: 'POST', headers: {'content-type': 'application/json'}, body: '{'
+    });
+    assert.equal(resposta.status, 400);
+    assert.equal((await resposta.json()).mensagem, 'JSON inválido.');
 });
