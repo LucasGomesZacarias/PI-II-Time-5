@@ -2,9 +2,14 @@ import express, { Request, Response } from "express";
 import "dotenv/config";
 import { initPool } from "./db";
 import { rotasCadastroDemanda } from "./rotas/cadastroDemanda";
+import { rotasUsuarios } from "./rotas/usuarios";
+import cors from "cors";
 
 const app = express();
 const PORT = 3000;
+
+// libera as chamadas vindas das telas (outra origem/porta)
+app.use(cors());
 
 // requisições em JSON
 app.use(express.json());
@@ -16,6 +21,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // rotas
 rotasCadastroDemanda(app);
+rotasUsuarios(app);
 
 // liga o banco e depois sobe o servidor
 async function iniciarServidor() {

@@ -1,0 +1,48 @@
+# Autor: Luiz Felipe da Conceição
+# Requisições de teste das rotas de usuários (extensão REST Client do VS Code;
+# no Thunder Client/Postman basta copiar método, URL e corpo).
+
+### GET /usuarios - lista sem senha (200)
+GET http://localhost:3000/usuarios
+
+### POST /login - válido (200)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{ "email": "admin@nexo.com", "senha": "Admin@123" }
+
+### POST /login - campo ausente (400)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{ "email": "admin@nexo.com" }
+
+### POST /login - senha errada (401)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{ "email": "admin@nexo.com", "senha": "errada" }
+
+### POST /usuarios - válido (201)
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{ "nome": "Joao Silva", "email": "joao@nexo.com", "senha": "Senha@123", "confirmaSenha": "Senha@123" }
+
+### POST /usuarios - e-mail repetido (409) - rode o anterior antes
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{ "nome": "Joao Silva", "email": "joao@nexo.com", "senha": "Senha@123" }
+
+### POST /usuarios - senha fraca (400)
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{ "nome": "Maria Souza", "email": "maria@nexo.com", "senha": "123" }
+
+### POST /usuarios - tenta escolher perfil (ignorado, entra como Membro da Equipe)
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{ "nome": "Pedro Lima", "email": "pedro@nexo.com", "senha": "Senha@123", "perfil": "Administrador" }
