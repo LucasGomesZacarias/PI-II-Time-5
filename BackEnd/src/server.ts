@@ -3,6 +3,7 @@ import "dotenv/config";
 import { initPool } from "./db";
 import { rotasCadastroDemanda } from "./rotas/cadastroDemanda";
 import { rotasUsuarios } from "./rotas/usuarios";
+import { rotasDashboard } from "./rotas/dashboard";
 import cors from "cors";
 
 const app = express();
@@ -22,6 +23,7 @@ app.get("/", (req: Request, res: Response) => {
 // rotas
 rotasCadastroDemanda(app);
 rotasUsuarios(app);
+rotasDashboard(app);
 
 // liga o banco e depois sobe o servidor
 async function iniciarServidor() {
