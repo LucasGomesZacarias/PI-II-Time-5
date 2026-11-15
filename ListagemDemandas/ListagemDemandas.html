@@ -43,52 +43,36 @@
         <lista-demandas id="minha-lista"></lista-demandas>
 
     </main>
-
-    <button id="btn-carregar" class="botao" style="margin-bottom: 20px;">
-        Mostrar Demandas ficticias
-    </button>
-
     <script>
-    function carregarDemandas() {
-        const dadosSimulados = [
-            {
-                id: 1041,
-                codigo: "DEM-1041",
-                titulo: "Corrigir validação de prazo",
-                projeto: "Nexo",
-                tipo: "Defeito",
-                prioridade: "Crítica",
-                classePrioridade: "critica", 
-                status: "Aberta",
-                classeStatus: "aberta", 
-                responsavel: "Ana Ferreira",
-                dataCriacao: "10/09/2026",
-                prazo: "14/09/2026"
-            },
-            {
-                id: 1045,
-                codigo: "DEM-1045",
-                titulo: "Implementar filtro no painel",
-                projeto: "Alpha ERP",
-                tipo: "Melhoria",
-                prioridade: "Média",
-                classePrioridade: "media",
-                status: "Em andamento",
-                classeStatus: "andamento",
-                responsavel: "Caio Lima",
-                dataCriacao: "11/09/2026",
-                prazo: "19/09/2026"
-            }
-        ];
+         async function carregarDemandas(filtros = {}) {
+        // espera os componentes serem registrados pelo libComps.js (que é um módulo)
+        await customElements.whenDefined('lista-demandas');
 
-        const componenteLista = document.getElementById('minha-lista');
-        componenteLista.demandas = dadosSimulados; 
+        try {
+            const params = new URLSearchParams(filtros);
+            const resposta = await fetch('/demandas?' + params);
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                alert(dados.mensagem);
+                return;
+            }
+
+            document.getElementById('minha-lista').demandas = dados;
+        } catch (erro) {
+            console.error(erro);
+            alert("Não foi possível carregar as demandas.");
+        }
     }
 
-    const botao = document.getElementById('btn-carregar');
-    botao.addEventListener('click', carregarDemandas);
+    // quando o usuário clica em Filtrar, busca com os filtros escolhidos
+    document.querySelector('form-demandas').addEventListener('filtrar', (evento) => {
+        carregarDemandas(evento.detail);
+    });
 
-</script>
+    // carrega a lista completa ao abrir a página
+    carregarDemandas();
+    </script>
 
     <footer>
         <p>
