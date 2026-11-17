@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import "dotenv/config";
 import { initPool } from "./db";
+import { rotasListagemDemanda } from "./rotas/listagemDemanda"; 
 import { rotasCadastroDemanda } from "./rotas/cadastroDemanda";
 import { rotasUsuarios } from "./rotas/usuarios";
 import { rotasDashboard } from "./rotas/dashboard";
@@ -22,6 +23,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // rotas
 rotasCadastroDemanda(app);
+rotasListagemDemanda(app); 
 rotasUsuarios(app);
 rotasDashboard(app);
 

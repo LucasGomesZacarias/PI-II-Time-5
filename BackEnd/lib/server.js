@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
 const db_1 = require("./db");
+const listagemDemanda_1 = require("./rotas/listagemDemanda");
 const cadastroDemanda_1 = require("./rotas/cadastroDemanda");
 const usuarios_1 = require("./rotas/usuarios");
 const dashboard_1 = require("./rotas/dashboard");
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 });
 // rotas
 (0, cadastroDemanda_1.rotasCadastroDemanda)(app);
+(0, listagemDemanda_1.rotasListagemDemanda)(app);
 (0, usuarios_1.rotasUsuarios)(app);
 (0, dashboard_1.rotasDashboard)(app);
 // liga o banco e depois sobe o servidor
