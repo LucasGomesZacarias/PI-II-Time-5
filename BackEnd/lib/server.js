@@ -19,6 +19,8 @@ const listagemDemanda_1 = require("./rotas/listagemDemanda");
 const cadastroDemanda_1 = require("./rotas/cadastroDemanda");
 const usuarios_1 = require("./rotas/usuarios");
 const dashboard_1 = require("./rotas/dashboard");
+const detalhesDemanda_1 = require("./rotas/detalhesDemanda");
+const projetos_1 = require("./rotas/projetos");
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const PORT = 3000;
@@ -35,6 +37,8 @@ app.get("/", (req, res) => {
 (0, listagemDemanda_1.rotasListagemDemanda)(app);
 (0, usuarios_1.rotasUsuarios)(app);
 (0, dashboard_1.rotasDashboard)(app);
+(0, detalhesDemanda_1.rotasDetalhesDemanda)(app);
+(0, projetos_1.rotasProjetos)(app);
 // liga o banco e depois sobe o servidor
 function iniciarServidor() {
     return __awaiter(this, void 0, void 0, function* () {
