@@ -20,7 +20,7 @@ function rotasListagemDemanda(app) {
         // pega os parâmetros enviados na URL
         const { status, prioridade, tipo, responsavelId, projetoId, busca, ordenarPor, direcao } = req.query;
         // listas com os únicos valores aceitos
-        const statusValidos = ["Aberta", "Em andamento", "Concluída"];
+        const statusValidos = ["Aberta", "Em andamento", "Em revisão", "Concluída", "Cancelada"];
         const prioridadesValidas = ["Crítica", "Alta", "Média", "Baixa"];
         const tiposValidos = ["Tarefa", "Defeito", "Melhoria", "Documentação"];
         // colunas permitidas na ordenação (lista fixa para evitar SQL injection)
@@ -29,11 +29,11 @@ function rotasListagemDemanda(app) {
             prioridade: `CASE d.prioridade WHEN 'Crítica' THEN 1 WHEN 'Alta' THEN 2 WHEN 'Média' THEN 3 WHEN 'Baixa' THEN 4 ELSE 5 END`,
             dataCriacao: `d.data_criacao`,
             prazo: `d.prazo`,
-            status: `CASE d.status WHEN 'Aberta' THEN 1 WHEN 'Em andamento' THEN 2 WHEN 'Concluída' THEN 3 ELSE 4 END`
+            status: `CASE d.status WHEN 'Aberta' THEN 1 WHEN 'Em andamento' THEN 2 WHEN 'Em revisão' THEN 3 WHEN 'Concluída' THEN 4 WHEN 'Cancelada' THEN 5 ELSE 6 END`
         };
         // validar os filtros (cada um é opcional, mas se vier precisa ser válido)
         if (status !== undefined && !statusValidos.includes(String(status))) {
-            return res.status(400).json({ mensagem: "Status inválido. Use Aberta, Em andamento ou Concluída" });
+            return res.status(400).json({ mensagem: "Status inválido. Use Aberta, Em andamento, Em revisão, Concluída ou Cancelada" });
         }
         if (prioridade !== undefined && !prioridadesValidas.includes(String(prioridade))) {
             return res.status(400).json({ mensagem: "Prioridade inválida. Use Crítica, Alta, Média ou Baixa" });
@@ -133,7 +133,9 @@ function rotasListagemDemanda(app) {
             const classesStatus = {
                 "Aberta": "aberta",
                 "Em andamento": "andamento",
-                "Concluída": "concluida"
+                "Em revisão": "revisao",
+                "Concluída": "concluida",
+                "Cancelada": "cancelada"
             };
             // monta o formato que o componente espera
             const demandas = ((_a = result.rows) !== null && _a !== void 0 ? _a : []).map(linha => { var _a, _b, _c, _d; return ({
