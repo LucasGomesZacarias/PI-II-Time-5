@@ -1,6 +1,7 @@
 // Autor: Luiz Felipe da Conceição
 import { Express, Request, Response } from "express";
 import { getConn } from "../db";
+import bcrypt from "bcryptjs";
 
 // mesmas regras de e-mail e senha da tela de login (script.js), repetidas aqui
 // porque a validação do servidor não pode depender do navegador
@@ -41,7 +42,7 @@ export function rotasUsuarios(app: Express) {
             const usuario = result.rows?.[0] as any;
 
             // mesma mensagem para e-mail inexistente e senha errada (não revela qual dos dois errou)
-            if (!usuario || usuario.senha !== senha) {
+            if (!usuario || !(await bcrypt.compare(String(senha), usuario.senha))) {
                 return res.status(401).json({ mensagem: "E-mail ou senha inválidos" });
             }
 
@@ -105,10 +106,16 @@ export function rotasUsuarios(app: Express) {
             return res.status(400).json({ mensagem: "A senha deve ter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula e um caractere especial" });
         }
 
+        if (bcrypt.truncates(senhaTexto)) {
+            return res.status(400).json({ mensagem: "A senha deve ter no máximo 72 bytes" });
+        }
+
         // a confirmação só é conferida quando a tela envia
         if (confirmaSenha !== undefined && confirmaSenha !== senhaTexto) {
             return res.status(400).json({ mensagem: "As senhas não são iguais" });
         }
+
+        const senhaHash = await bcrypt.hash(senhaTexto, 12);
 
         let conn;
 
@@ -126,7 +133,7 @@ export function rotasUsuarios(app: Express) {
             await conn.execute(
                 `INSERT INTO usuarios (nome, email, senha, perfil)
                  VALUES (:nome, :email, :senha, 'Membro da Equipe')`,
-                { nome: nomeLimpo, email: emailLimpo, senha: senhaTexto },
+                { nome: nomeLimpo, email: emailLimpo, senha: senhaHash },
                 { autoCommit: true }
             );
 

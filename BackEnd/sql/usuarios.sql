@@ -19,3 +19,10 @@ INSERT INTO usuarios (nome, email, senha, perfil) VALUES ('Lucas Lider', 'lider@
 INSERT INTO usuarios (nome, email, senha, perfil) VALUES ('Maria Membro', 'membro@nexo.com', 'Membro@123', 'Membro da Equipe');
 
 COMMIT;
+
+UPDATE usuarios SET senha = '$2b$12$Hr9Y9yR1vFTyakSzjwcGLO0YUSjnpFPrrhDuQD9SWwfdSkXC1wLPe' WHERE email = 'admin@nexo.com';
+UPDATE usuarios SET senha = '$2b$12$/QAhMfB8oTUus2bKjWCD3OrcGMYEUIyrePLkhelCY5xtsOuE3gg5O' WHERE email = 'lider@nexo.com';
+UPDATE usuarios SET senha = '$2b$12$afui98M5udGlhFQoCm3pLeIrPxDMm/Y9YJXbVYcC7w2GJdkR2r9cK' WHERE email = 'membro@nexo.com';
+COMMIT;
+
+
