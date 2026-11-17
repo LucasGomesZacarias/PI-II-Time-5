@@ -4,17 +4,41 @@ import { Express } from "express";
 import { getConn } from "../db";
 import { demandasTeste, comentarioTeste, usuariosTeste } from "../dados/dadosTeste";
 
-// IDs das rotas devem conter somente dígitos decimais e representar inteiros positivos.
+// Aceita apenas identificadores inteiros positivos.
 function lerId(valor: string): number | null {
     if (!/^\d+$/.test(valor)) return null;
     const id = Number(valor);
     return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+// Busca as alterações registradas para uma demanda
+ export async function buscarHistorico(demandaId: number){
+    const conexao = await getConn();
+
+    try{
+        const resultado = await conexao.execute(
+    `SELECT h.tipo_alteracao AS "campo",
+            h.valor_anterior AS "valorAnterior",
+            h.valor_novo AS "valorNovo",
+            h.data_hora AS "dataAlteracao",
+            u.nome AS "autor"
+    FROM historico_demanda h
+    JOIN usuario u ON u.id_usuario = h.idusuario
+    WHERE h.iddemanda = :demandaId
+    ORDER BY h.data_hora, h.id_historico`,
+                { demandaId }
+        );
+
+        return resultado.rows || [];
+    } finally {
+        await conexao.close();
+    }
+}
+
 //Reúne as rotas responsáveis pelos detalhes da demanda
 export function rotasDetalhesDemanda(app: Express) {
 
-    // Busca uma demanda pelo identificador
+    // Reunião 4: busca uma demanda pelo identificador.
     app.get("/demandas/:id", async (req, res) => {
         const id = lerId(req.params.id);
 
@@ -34,18 +58,27 @@ export function rotasDetalhesDemanda(app: Express) {
             return res.status(200).json(demanda);
         }
 
+        // A consulta ao Oracle foi preparada, mas depende do esquema e da integração da equipe.
         let conn;
 
         try {
             conn = await getConn();
 
             const resultado = await conn.execute(
-                `SELECT id, titulo, descricao, tipo, prioridade, status,
-                 projeto_id, responsavel_id, prazo, data_criacao,
-                data_atualizacao
-                FROM demandas
-                WHERE id = :id`,
-                {id}
+        `SELECT id_demanda AS "id",
+                titulo AS "titulo",
+                descricao AS "descricao",
+                tipo AS "tipo",
+                prioridade AS "prioridade",
+                status AS "status",
+                idprojeto AS "projetoId",
+                idusuario AS "responsavelId",
+                prazo AS "prazo",
+                data_criacao AS "dataCriacao",
+                data_atualizacao AS "dataAtualizacao"
+        FROM demanda
+        WHERE id_demanda = :id`,
+            { id }
             );
 
             if (!resultado.rows || resultado.rows.length === 0) {
@@ -61,8 +94,8 @@ export function rotasDetalhesDemanda(app: Express) {
         }
     });
 
-    // Lista os comentários de uma demanda no modo de teste
-    app.get("/demandas/:id/comentarios", (req, res) => {
+    // Reunião 4: lista os comentários da demanda.
+    app.get("/demandas/:id/comentarios", async (req, res) => {
         const id = lerId(req.params.id);
 
         if (id === null) {
@@ -70,9 +103,45 @@ export function rotasDetalhesDemanda(app: Express) {
         }
 
         if (process.env.DADOS_EM_MEMORIA !== "true") {
-            return res.status(503).json({
-                mensagem: "Consulta de comentários no banco ainda não implementados"
-            });
+            let conn;
+
+            try {
+                conn = await getConn();
+
+                const demanda = await conn.execute(
+                    `SELECT id_demanda FROM demanda WHERE id_demanda = :id`,
+                    { id }
+                );
+
+                if (!demanda.rows || demanda.rows.length === 0) {
+                    return res.status(404).json({
+                        mensagem: "Demanda não encontrada"
+                    });
+                }
+
+                const resultado = await conn.execute(
+            `SELECT c.id_comentario AS "id",
+                    c.iddemanda AS "demandaId",
+                    c.idusuario AS "usuarioId",
+                    u.nome AS "autor",
+                    c.texto AS "texto",
+                    c.data_criacao AS "dataHora"
+            FROM comentario c
+            JOIN usuario u ON u.id_usuario = c.idusuario
+            WHERE c.iddemanda = :id
+            ORDER BY c.data_criacao, c.id_comentario`,
+                        { id }
+                );
+
+                return res.status(200).json(resultado.rows ?? []);
+            } catch (erro) {
+                console.error(erro);
+                return res.status(500).json({
+                    mensagem: "Erro ao buscar comentários"
+                });
+            } finally {
+                if (conn) await conn.close();
+            }
         }
 
         const demanda = demandasTeste.find(item => item.id === id);
@@ -81,6 +150,7 @@ export function rotasDetalhesDemanda(app: Express) {
             return res.status(404).json({ mensagem: "Demanda não encontrada"});
         }
 
+        // Filtra pela demanda e acrescenta o nome do usuário de teste a cada comentário.
         const comentarios = comentarioTeste
             .filter(item => item.demandaId === id)
             .map(item => ({
@@ -90,8 +160,8 @@ export function rotasDetalhesDemanda(app: Express) {
         return res.status(200).json(comentarios);
     })
 
-   // Registra um comentário em memória para testes.
-    app.post("/demandas/:id/comentarios", (req, res) => {
+    // Reunião 4: registra um comentário vinculado à demanda.
+    app.post("/demandas/:id/comentarios", async (req, res) => {
         const demandaId = lerId(req.params.id);
         const { usuarioId, texto } = req.body ?? {};
 
@@ -100,10 +170,70 @@ export function rotasDetalhesDemanda(app: Express) {
         }
 
         if (process.env.DADOS_EM_MEMORIA !== "true") {
-            return res.status(503).json({
-                mensagem: "Registro de comentários no banco ainda não implementado."
+    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
+        return res.status(400).json({ mensagem: "Usuário inválido." });
+    }
+
+    if (typeof texto !== "string" || !texto.trim()) {
+        return res.status(400).json({
+            mensagem: "O comentário não pode estar vazio."
+        });
+    }
+
+    const textoLimpo = texto.trim();
+
+    if (Buffer.byteLength(textoLimpo, "utf8") > 1000) {
+        return res.status(400).json({
+            mensagem: "O comentário é muito longo."
+        });
+    }
+
+    let conn;
+
+    try {
+        conn = await getConn();
+
+        const demanda = await conn.execute(
+            `SELECT id_demanda FROM demanda WHERE id_demanda = :id`,
+            { id: demandaId }
+        );
+
+        if (!demanda.rows || demanda.rows.length === 0) {
+            return res.status(404).json({
+                mensagem: "Demanda não encontrada."
             });
         }
+
+        const usuario = await conn.execute(
+            `SELECT id_usuario FROM usuario WHERE id_usuario = :id`,
+            { id: usuarioId }
+        );
+
+        if (!usuario.rows || usuario.rows.length === 0) {
+            return res.status(400).json({
+                mensagem: "Usuário não encontrado."
+            });
+        }
+
+        await conn.execute(
+            `INSERT INTO comentario (iddemanda, idusuario, texto)
+             VALUES (:demandaId, :usuarioId, :texto)`,
+            { demandaId, usuarioId, texto: textoLimpo },
+            { autoCommit: true }
+        );
+
+        return res.status(201).json({
+            mensagem: "Comentário criado com sucesso."
+        });
+    } catch (erro) {
+        console.error(erro);
+        return res.status(500).json({
+            mensagem: "Erro ao criar comentário."
+        });
+    } finally {
+        if (conn) await conn.close();
+    }
+}
 
         const demanda = demandasTeste.find(item => item.id === demandaId);
 
@@ -125,6 +255,7 @@ export function rotasDetalhesDemanda(app: Express) {
             return res.status(400).json({ mensagem: "O comentário não pode estar vazio." });
         }
 
+        // A data é definida pelo servidor; o comentário fica apenas na memória do processo.
         const comentario = {
             demandaId,
             usuarioId,

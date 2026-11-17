@@ -4,6 +4,7 @@ import { initPool } from "./db";
 import { rotasCadastroDemanda } from "./rotas/cadastroDemanda";
 import { rotasUsuarios } from "./rotas/usuarios";
 import { rotasDashboard } from "./rotas/dashboard";
+import { rotasDetalhesDemanda } from "./rotas/detalhesDemanda";
 import cors from "cors";
 
 const app = express();
@@ -24,6 +25,7 @@ app.get("/", (req: Request, res: Response) => {
 rotasCadastroDemanda(app);
 rotasUsuarios(app);
 rotasDashboard(app);
+rotasDetalhesDemanda(app);
 
 // liga o banco e depois sobe o servidor
 async function iniciarServidor() {

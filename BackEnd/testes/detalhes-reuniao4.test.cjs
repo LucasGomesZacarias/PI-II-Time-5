@@ -1,4 +1,4 @@
-// Autor: Augusto Henrique Marçura. Testes HTTP das suas rotas da reunião 4.
+// Autor: Augusto Henrique Marçura. Reunião 4: testes HTTP das rotas de detalhes e comentários.
 const { test, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
