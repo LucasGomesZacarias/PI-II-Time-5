@@ -6,6 +6,7 @@ import { rotasCadastroDemanda } from "./rotas/cadastroDemanda";
 import { rotasUsuarios } from "./rotas/usuarios";
 import { rotasDashboard } from "./rotas/dashboard";
 import { rotasDetalhesDemanda } from "./rotas/detalhesDemanda";
+import { rotasProjetos } from "./rotas/projetos";
 import cors from "cors";
 
 const app = express();
@@ -28,6 +29,7 @@ rotasListagemDemanda(app);
 rotasUsuarios(app);
 rotasDashboard(app);
 rotasDetalhesDemanda(app);
+rotasProjetos(app);
 
 // liga o banco e depois sobe o servidor
 async function iniciarServidor() {
