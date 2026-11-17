@@ -11,7 +11,8 @@
   >
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
-  <!-- Executa a busca e a validação após carregar os elementos da página. -->
+  <!-- api.js busca os dados em GET /dashboard; script.js preenche a tela e valida a busca. -->
+  <script src="api.js" defer></script>
   <script src="script.js" defer></script>
   <script type="module" src="/componentes/libComps.js"></script>
 </head>
@@ -34,41 +35,44 @@
       <a class="botao" href="#demandas">Ver demandas</a>
     </div>
 
-    <!-- Contagem por status. Os números ainda são exemplos estáticos. -->
+    <!-- Erro devolvido pela API (ou servidor fora do ar). Fica escondido quando tudo dá certo. -->
+    <div id="mensagemDashboard" class="alert alert-danger d-none" role="alert"></div>
+
+    <!-- Contagem por status. Os números vêm de GET /dashboard (o script.js preenche). -->
     <div class="resumo">
       <div class="card-resumo total">
         <p>Total de demandas</p>
-        <strong>48</strong>
-        <span>Projeto Nexo</span>
+        <strong id="totalDemandas">-</strong>
+        <span>Todos os projetos</span>
       </div>
 
       <div class="card-resumo aberta">
         <p>Abertas</p>
-        <strong>9</strong>
+        <strong data-status="Aberta">-</strong>
         <span>Aguardando início</span>
       </div>
 
       <div class="card-resumo andamento">
         <p>Em andamento</p>
-        <strong>21</strong>
+        <strong data-status="Em andamento">-</strong>
         <span>Em execução</span>
       </div>
 
       <div class="card-resumo revisao">
         <p>Em revisão</p>
-        <strong>6</strong>
+        <strong data-status="Em revisão">-</strong>
         <span>Aguardando validação</span>
       </div>
 
       <div class="card-resumo concluida">
         <p>Concluídas</p>
-        <strong>10</strong>
+        <strong data-status="Concluída">-</strong>
         <span>Finalizadas</span>
       </div>
 
       <div class="card-resumo cancelada">
         <p>Canceladas</p>
-        <strong>2</strong>
+        <strong data-status="Cancelada">-</strong>
         <span>Não serão executadas</span>
       </div>
     </div>
@@ -84,30 +88,31 @@
           <a href="#demandas">Ver lista</a>
         </div>
 
+        <!-- A largura de cada barra é calculada pelo script.js. -->
         <div class="prioridades">
-          <div class="linha-prioridade">
+          <div class="linha-prioridade" data-prioridade="Crítica">
             <span class="ponto critica"></span>
             <span class="nome-prioridade">Crítica</span>
             <div class="barra"><span class="preenchimento critica-barra"></span></div>
-            <strong>4</strong>
+            <strong>-</strong>
           </div>
-          <div class="linha-prioridade">
+          <div class="linha-prioridade" data-prioridade="Alta">
             <span class="ponto alta"></span>
             <span class="nome-prioridade">Alta</span>
             <div class="barra"><span class="preenchimento alta-barra"></span></div>
-            <strong>12</strong>
+            <strong>-</strong>
           </div>
-          <div class="linha-prioridade">
+          <div class="linha-prioridade" data-prioridade="Média">
             <span class="ponto media"></span>
             <span class="nome-prioridade">Média</span>
             <div class="barra"><span class="preenchimento media-barra"></span></div>
-            <strong>20</strong>
+            <strong>-</strong>
           </div>
-          <div class="linha-prioridade">
+          <div class="linha-prioridade" data-prioridade="Baixa">
             <span class="ponto baixa"></span>
             <span class="nome-prioridade">Baixa</span>
             <div class="barra"><span class="preenchimento baixa-barra"></span></div>
-            <strong>12</strong>
+            <strong>-</strong>
           </div>
         </div>
       </div>
@@ -121,10 +126,10 @@
         </div>
 
         <div class="lista-tipos">
-          <div><span>Tarefas</span><strong>25</strong></div>
-          <div><span>Defeitos</span><strong>8</strong></div>
-          <div><span>Melhorias</span><strong>10</strong></div>
-          <div><span>Documentação</span><strong>5</strong></div>
+          <div data-tipo="Tarefa"><span>Tarefas</span><strong>-</strong></div>
+          <div data-tipo="Defeito"><span>Defeitos</span><strong>-</strong></div>
+          <div data-tipo="Melhoria"><span>Melhorias</span><strong>-</strong></div>
+          <div data-tipo="Documentação"><span>Documentação</span><strong>-</strong></div>
         </div>
       </div>
     </div>
@@ -151,7 +156,7 @@
         </form>
         <p id="mensagemBusca" class="mensagem-busca"></p>
 
-        <!-- O JavaScript mostra ou esconde linhas desta tabela após validar a busca. -->
+        <!-- As linhas vêm da API. O JavaScript mostra ou esconde linhas após validar a busca. -->
         <div class="table-responsive">
           <table id="tabelaDemandas" class="table table-dark table-striped table-hover align-middle tabela-demandas">
             <thead class="table-dark">
@@ -162,18 +167,9 @@
                 <th>Prazo</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tabelaCriticas">
               <tr>
-                <td><span class="tag critica-tag">Crítica</span> DEM-1041 - Corrigir validação de prazo em feriados</td>
-                <td>Nexo</td>
-                <td>Ana Ferreira</td>
-                <td>14/09/2026</td>
-              </tr>
-              <tr>
-                <td><span class="tag critica-tag">Crítica</span> DEM-1043 - Corrigir acesso à edição de demandas</td>
-                <td>Nexo</td>
-                <td>Bruno Costa</td>
-                <td>15/09/2026</td>
+                <td colspan="4" class="text-center">Carregando...</td>
               </tr>
             </tbody>
           </table>
@@ -188,18 +184,9 @@
           </div>
         </div>
 
-        <ul class="lista-prazos">
+        <ul class="lista-prazos" id="listaPrazos">
           <li>
-            <div><strong>DEM-1042 - Ajustar mensagem de prazo inválido</strong><span>Defeito - Alta - Em andamento</span></div>
-            <span class="data-prazo">18/09</span>
-          </li>
-          <li>
-            <div><strong>DEM-1045 - Implementar filtro por prioridade</strong><span>Tarefa - Média - Em andamento</span></div>
-            <span class="data-prazo">19/09</span>
-          </li>
-          <li>
-            <div><strong>DEM-1048 - Documentar fluxo de cancelamento</strong><span>Documentação - Baixa - Aberta</span></div>
-            <span class="data-prazo">20/09</span>
+            <div><span>Carregando...</span></div>
           </li>
         </ul>
       </div>

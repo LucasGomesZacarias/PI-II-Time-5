@@ -47,34 +47,34 @@ export function rotasDashboard(app: Express) {
         // Total geral de demandas cadastradas.
         conn.execute(`
           SELECT COUNT(*) AS "total"
-          FROM demandas
+          FROM Demanda
         `),
 
         // Quantidade de demandas para cada status.
         conn.execute(`
           SELECT status AS "chave", COUNT(*) AS "quantidade"
-          FROM demandas
+          FROM Demanda
           GROUP BY status
         `),
 
         // Quantidade de demandas para cada prioridade.
         conn.execute(`
           SELECT prioridade AS "chave", COUNT(*) AS "quantidade"
-          FROM demandas
+          FROM Demanda
           GROUP BY prioridade
         `),
 
         // Quantidade de demandas para cada tipo.
         conn.execute(`
           SELECT tipo AS "chave", COUNT(*) AS "quantidade"
-          FROM demandas
+          FROM Demanda
           GROUP BY tipo
         `),
 
         // Demandas críticas que ainda não foram concluídas ou canceladas.
         conn.execute(`
           SELECT
-            d.id AS "id",
+            d.id_demanda AS "id",
             d.titulo AS "titulo",
             d.tipo AS "tipo",
             d.prioridade AS "prioridade",
@@ -82,18 +82,18 @@ export function rotasDashboard(app: Express) {
             TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo",
             p.nome AS "projeto",
             u.nome AS "responsavel"
-          FROM demandas d
-          JOIN projetos p ON p.id = d.projeto_id
-          LEFT JOIN usuarios u ON u.id = d.responsavel_id
+          FROM Demanda d
+          JOIN Projeto p ON p.id_projeto = d.idProjeto
+          LEFT JOIN Usuario u ON u.id_usuario = d.idUsuario
           WHERE d.prioridade = 'Crítica'
             AND d.status IN ('Aberta', 'Em andamento', 'Em revisão')
-          ORDER BY d.prazo NULLS LAST, d.id
+          ORDER BY d.prazo NULLS LAST, d.id_demanda
         `),
 
         // Demandas em aberto cujo prazo acontece entre hoje e os próximos 7 dias.
         conn.execute(`
           SELECT
-            d.id AS "id",
+            d.id_demanda AS "id",
             d.titulo AS "titulo",
             d.tipo AS "tipo",
             d.prioridade AS "prioridade",
@@ -101,13 +101,13 @@ export function rotasDashboard(app: Express) {
             TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo",
             p.nome AS "projeto",
             u.nome AS "responsavel"
-          FROM demandas d
-          JOIN projetos p ON p.id = d.projeto_id
-          LEFT JOIN usuarios u ON u.id = d.responsavel_id
+          FROM Demanda d
+          JOIN Projeto p ON p.id_projeto = d.idProjeto
+          LEFT JOIN Usuario u ON u.id_usuario = d.idUsuario
           WHERE d.status IN ('Aberta', 'Em andamento', 'Em revisão')
             AND d.prazo >= TRUNC(SYSDATE)
             AND d.prazo < TRUNC(SYSDATE) + 8
-          ORDER BY d.prazo, d.id
+          ORDER BY d.prazo, d.id_demanda
         `),
       ]);
 
