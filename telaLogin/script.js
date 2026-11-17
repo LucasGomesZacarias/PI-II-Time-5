@@ -1,5 +1,12 @@
 // LUIZ FELIPE DA CONCEICAO
 
+//As chamadas à API ficam no api.js (loginApi e cadastrarUsuarioApi)
+//Página para onde o login leva
+const PAGINA_APOS_LOGIN = "../Dashboard/dashboard.html";
+
+//Chave onde o usuário logado fica guardado no navegador (sessionStorage)
+const CHAVE_USUARIO_LOGADO = "usuarioLogado";
+
 //Troca entre login e cadastro
 const card = document.querySelector(".card");
 const botaoFacaLogin = document.querySelector("#btnFacaLogin");
@@ -39,6 +46,10 @@ const erroEmailCadastro = document.querySelector("#erroEmailCadastro");
 const erroSenhaCadastro = document.querySelector("#erroSenhaCadastro");
 const erroConfirmaSenha = document.querySelector("#erroConfirmaSenha");
 
+//Mensagens de erro devolvidas pela API
+const erroApiLogin = document.querySelector("#erroApiLogin");
+const erroApiCadastro = document.querySelector("#erroApiCadastro");
+
 //Mensagens de sucesso
 const mensagemLogin = document.querySelector("#mensagemLogin");
 const mensagemCadastro = document.querySelector("#mensagemCadastro");
@@ -51,7 +62,8 @@ const camposLogin = [
 
 const mensagensErroLogin = [
     erroEmailLogin,
-    erroSenhaLogin
+    erroSenhaLogin,
+    erroApiLogin
 ];
 
 const camposCadastro = [
@@ -65,7 +77,8 @@ const mensagensErroCadastro = [
     erroNome,
     erroEmailCadastro,
     erroSenhaCadastro,
-    erroConfirmaSenha
+    erroConfirmaSenha,
+    erroApiCadastro
 ];
 
 //Formato do email 
@@ -75,6 +88,18 @@ const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 function mostrarErro(campo, elementoErro, mensagem) {
     campo.classList.add("is-invalid");
     elementoErro.innerText = mensagem;
+}
+
+//Mostra o erro da API no campo que ela indicou (erro.campo).
+//Sem campo (ex.: servidor fora do ar), mostra a mensagem geral do formulário.
+function mostrarErroDaApi(erro, camposDoFormulario, erroGeral) {
+    const destino = camposDoFormulario[erro.campo];
+
+    if (destino) {
+        mostrarErro(destino.campo, destino.erro, erro.message);
+    } else {
+        erroGeral.innerText = erro.message;
+    }
 }
 
 //Limpa os erros do formulario
@@ -113,7 +138,7 @@ function senhaAtendeRegras(senha) {
 }
 
 //Login
-formularioLogin.addEventListener("submit", function (event) {
+formularioLogin.addEventListener("submit", async function (event) {
     event.preventDefault();
     limparErros(camposLogin, mensagensErroLogin, mensagemLogin);
 
@@ -140,13 +165,30 @@ formularioLogin.addEventListener("submit", function (event) {
         return;
     }
 
-    //Dados validos (ainda sem servidor)
-    console.log({ email });
-    mensagemLogin.innerText = "Dados válidos. A autenticação será conectada ao servidor em uma próxima etapa.";
+    //Dados validos: envia para a API (POST /login)
+    const botao = formularioLogin.querySelector("button[type=submit]");
+    botao.disabled = true;
+
+    try {
+        const usuario = await loginApi(email, senha);
+
+        //Guarda o usuário (sem senha) para as outras telas e vai para a página inicial
+        sessionStorage.setItem(CHAVE_USUARIO_LOGADO, JSON.stringify(usuario));
+        mensagemLogin.innerText = "Login realizado! Redirecionando...";
+        window.location.href = PAGINA_APOS_LOGIN;
+    } catch (erro) {
+        //Erro devolvido pela API (400, 401 ou servidor fora do ar): aparece no campo certo
+        mostrarErroDaApi(erro, {
+            email: { campo: campoEmailLogin, erro: erroEmailLogin },
+            senha: { campo: campoSenhaLogin, erro: erroSenhaLogin }
+        }, erroApiLogin);
+    } finally {
+        botao.disabled = false;
+    }
 });
 
 //Cadastro
-formularioCadastro.addEventListener("submit", function (event) {
+formularioCadastro.addEventListener("submit", async function (event) {
     event.preventDefault();
     limparErros(camposCadastro, mensagensErroCadastro, mensagemCadastro);
 
@@ -202,7 +244,28 @@ formularioCadastro.addEventListener("submit", function (event) {
         return;
     }
 
-    //Dados validos 
-    console.log({ nome, email });
-    mensagemCadastro.innerText = "Dados válidos. O cadastro será conectado ao servidor em uma próxima etapa.";
+    //Dados validos: envia para a API (POST /usuarios)
+    const botao = formularioCadastro.querySelector("button[type=submit]");
+    botao.disabled = true;
+
+    try {
+        await cadastrarUsuarioApi({ nome, email, senha, confirmaSenha });
+
+        //Cadastro feito: limpa o formulário e leva para o login com o e-mail já preenchido
+        formularioCadastro.reset();
+        campoEmailLogin.value = email;
+        card.classList.remove("cadastroActive");
+        card.classList.add("loginActive");
+        mensagemLogin.innerText = "Cadastro realizado! Faça login para entrar.";
+    } catch (erro) {
+        //Erro devolvido pela API (400, 409 ou servidor fora do ar): aparece no campo certo
+        mostrarErroDaApi(erro, {
+            nome: { campo: campoNome, erro: erroNome },
+            email: { campo: campoEmailCadastro, erro: erroEmailCadastro },
+            senha: { campo: campoSenhaCadastro, erro: erroSenhaCadastro },
+            confirmaSenha: { campo: campoConfirmaSenha, erro: erroConfirmaSenha }
+        }, erroApiCadastro);
+    } finally {
+        botao.disabled = false;
+    }
 });

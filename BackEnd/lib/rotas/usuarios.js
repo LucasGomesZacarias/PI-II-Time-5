@@ -38,23 +38,30 @@ function rotasUsuarios(app) {
         var _a;
         var _b;
         const { email, senha } = (_b = req.body) !== null && _b !== void 0 ? _b : {};
-        // campos obrigatórios
-        if (!email || !senha) {
-            return res.status(400).json({ mensagem: "E-mail e senha são obrigatórios" });
+        // campos obrigatórios (o "campo" diz à tela qual input marcar)
+        if (!email) {
+            return res.status(400).json({ mensagem: "O e-mail é obrigatório", campo: "email" });
+        }
+        if (!senha) {
+            return res.status(400).json({ mensagem: "A senha é obrigatória", campo: "senha" });
         }
         let conn;
         try {
             conn = yield (0, db_1.getConn)();
             // o e-mail é guardado em minúsculo, então a busca também usa minúsculo
-            const result = yield conn.execute(`SELECT id as "id", nome as "nome", email as "email", perfil as "perfil", senha as "senha"
-                 FROM usuarios WHERE email = :email`, { email: String(email).trim().toLowerCase() });
+            const result = yield conn.execute(`SELECT id_usuario as "id", nome as "nome", email as "email", perfil as "perfil", status as "status", senha as "senha"
+                 FROM Usuario WHERE email = :email`, { email: String(email).trim().toLowerCase() });
             const usuario = (_a = result.rows) === null || _a === void 0 ? void 0 : _a[0];
             // mesma mensagem para e-mail inexistente e senha errada (não revela qual dos dois errou)
             if (!usuario || usuario.senha !== senha) {
-                return res.status(401).json({ mensagem: "E-mail ou senha inválidos" });
+                return res.status(401).json({ mensagem: "E-mail ou senha inválidos", campo: "senha" });
             }
-            // a senha nunca sai na resposta
-            const { senha: _senha } = usuario, usuarioSemSenha = __rest(usuario, ["senha"]);
+            // usuário inativo não entra (ninguém é apagado, só fica Inativo)
+            if (usuario.status === "Inativo") {
+                return res.status(403).json({ mensagem: "Usuário inativo. Procure o administrador", campo: "email" });
+            }
+            // a senha e o status não saem na resposta
+            const { senha: _senha, status: _status } = usuario, usuarioSemSenha = __rest(usuario, ["senha", "status"]);
             return res.status(200).json(usuarioSemSenha);
         }
         catch (erro) {
@@ -73,8 +80,8 @@ function rotasUsuarios(app) {
         let conn;
         try {
             conn = yield (0, db_1.getConn)();
-            const result = yield conn.execute(`SELECT id as "id", nome as "nome", email as "email", perfil as "perfil"
-                 FROM usuarios ORDER BY nome`);
+            const result = yield conn.execute(`SELECT id_usuario as "id", nome as "nome", email as "email", perfil as "perfil"
+                 FROM Usuario ORDER BY nome`);
             return res.status(200).json((_a = result.rows) !== null && _a !== void 0 ? _a : []);
         }
         catch (erro) {
@@ -90,37 +97,43 @@ function rotasUsuarios(app) {
     app.post("/usuarios", (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
         const { nome, email, senha, confirmaSenha } = (_a = req.body) !== null && _a !== void 0 ? _a : {};
-        // campos obrigatórios
-        if (!nome || !email || !senha) {
-            return res.status(400).json({ mensagem: "Nome, e-mail e senha são obrigatórios" });
+        // campos obrigatórios (o "campo" diz à tela qual input marcar)
+        if (!nome) {
+            return res.status(400).json({ mensagem: "O nome é obrigatório", campo: "nome" });
+        }
+        if (!email) {
+            return res.status(400).json({ mensagem: "O e-mail é obrigatório", campo: "email" });
+        }
+        if (!senha) {
+            return res.status(400).json({ mensagem: "A senha é obrigatória", campo: "senha" });
         }
         const nomeLimpo = String(nome).trim();
         const emailLimpo = String(email).trim().toLowerCase();
         const senhaTexto = String(senha);
         // nome: 5 a 100 caracteres, com nome e sobrenome
         if (nomeLimpo.length < 5 || nomeLimpo.length > 100 || nomeLimpo.split(/\s+/).length < 2) {
-            return res.status(400).json({ mensagem: "Informe nome e sobrenome (de 5 a 100 caracteres)" });
+            return res.status(400).json({ mensagem: "Informe nome e sobrenome (de 5 a 100 caracteres)", campo: "nome" });
         }
         if (!formatoEmail.test(emailLimpo)) {
-            return res.status(400).json({ mensagem: "E-mail inválido" });
+            return res.status(400).json({ mensagem: "Informe um endereço de e-mail válido", campo: "email" });
         }
         if (!senhaAtendeRegras(senhaTexto)) {
-            return res.status(400).json({ mensagem: "A senha deve ter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula e um caractere especial" });
+            return res.status(400).json({ mensagem: "A senha deve ter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula e um caractere especial", campo: "senha" });
         }
         // a confirmação só é conferida quando a tela envia
         if (confirmaSenha !== undefined && confirmaSenha !== senhaTexto) {
-            return res.status(400).json({ mensagem: "As senhas não são iguais" });
+            return res.status(400).json({ mensagem: "As senhas não são iguais", campo: "confirmaSenha" });
         }
         let conn;
         try {
             conn = yield (0, db_1.getConn)();
             // e-mail não pode se repetir
-            const existente = yield conn.execute(`SELECT id FROM usuarios WHERE email = :email`, { email: emailLimpo });
+            const existente = yield conn.execute(`SELECT id_usuario FROM Usuario WHERE email = :email`, { email: emailLimpo });
             if (existente.rows && existente.rows.length > 0) {
-                return res.status(409).json({ mensagem: "Já existe um usuário com esse e-mail" });
+                return res.status(409).json({ mensagem: "Já existe um usuário com esse e-mail", campo: "email" });
             }
             // o perfil nunca vem da requisição: quem se cadastra pela tela entra como Membro da Equipe
-            yield conn.execute(`INSERT INTO usuarios (nome, email, senha, perfil)
+            yield conn.execute(`INSERT INTO Usuario (nome, email, senha, perfil)
                  VALUES (:nome, :email, :senha, 'Membro da Equipe')`, { nome: nomeLimpo, email: emailLimpo, senha: senhaTexto }, { autoCommit: true });
             return res.status(201).json({
                 mensagem: "Usuário cadastrado com sucesso!",
@@ -130,7 +143,7 @@ function rotasUsuarios(app) {
         catch (erro) {
             // ORA-00001: dois cadastros do mesmo e-mail ao mesmo tempo
             if ((erro === null || erro === void 0 ? void 0 : erro.errorNum) === 1) {
-                return res.status(409).json({ mensagem: "Já existe um usuário com esse e-mail" });
+                return res.status(409).json({ mensagem: "Já existe um usuário com esse e-mail", campo: "email" });
             }
             console.error(erro);
             return res.status(500).json({ mensagem: "Erro ao cadastrar o usuário" });

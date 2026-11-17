@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
+    <script src="api.js" defer></script>
     <script src="script.js" defer></script>
     <title>Nexo.</title>
 </head>
@@ -41,6 +42,8 @@
                                 <div id="erroSenhaLogin" class="mensagemErro"></div>
                             </div>
                             <button type="submit">Entrar</button>
+                            <!-- Erro devolvido pela API (ex.: credenciais inválidas) -->
+                            <div id="erroApiLogin" class="mensagemErro" role="alert"></div>
                             <!-- Mensagem quando os dados estão certos -->
                             <div id="mensagemLogin" class="mensagemSucesso" role="status"></div>
                         </form>
@@ -86,6 +89,8 @@
                                 <div id="erroConfirmaSenha" class="mensagemErro"></div>
                             </div>
                             <button type="submit">Cadastrar</button>
+                            <!-- Erro devolvido pela API (ex.: e-mail já cadastrado) -->
+                            <div id="erroApiCadastro" class="mensagemErro" role="alert"></div>
                             <!-- Mensagem quando os dados estão certos -->
                             <div id="mensagemCadastro" class="mensagemSucesso" role="status"></div>
                         </form>
