@@ -1,7 +1,10 @@
 // Autor: Augusto Henrique Marçura
 
 import { Express } from "express";
+import { rotasEdicaoReal } from "./edicaoReal";
 import { getConn } from "../db";
+import { buscarUsuarioLogado } from "../autenticacao";
+import { podeFazer } from "../permissoes";
 import { demandasTeste, comentarioTeste, usuariosTeste } from "../dados/dadosTeste";
 
 // Aceita apenas identificadores inteiros positivos.
@@ -37,6 +40,7 @@ function lerId(valor: string): number | null {
 
 //Reúne as rotas responsáveis pelos detalhes da demanda
 export function rotasDetalhesDemanda(app: Express) {
+    rotasEdicaoReal(app);
 
     // Reunião 4: busca uma demanda pelo identificador.
     app.get("/demandas/:id", async (req, res) => {
@@ -170,10 +174,6 @@ export function rotasDetalhesDemanda(app: Express) {
         }
 
         if (process.env.DADOS_EM_MEMORIA !== "true") {
-    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
-        return res.status(400).json({ mensagem: "Usuário inválido." });
-    }
-
     if (typeof texto !== "string" || !texto.trim()) {
         return res.status(400).json({
             mensagem: "O comentário não pode estar vazio."
@@ -193,8 +193,16 @@ export function rotasDetalhesDemanda(app: Express) {
     try {
         conn = await getConn();
 
+        const usuario = await buscarUsuarioLogado(conn, req);
+        if (!usuario) {
+            return res.status(401).json({ mensagem: "Faça login para comentar." });
+        }
+        if (!podeFazer(usuario.perfil, "comentar")) {
+            return res.status(403).json({ mensagem: "Você não tem permissão para comentar." });
+        }
+
         const demanda = await conn.execute(
-            `SELECT id_demanda FROM demanda WHERE id_demanda = :id`,
+            `SELECT idprojeto AS "projetoId" FROM demanda WHERE id_demanda = :id`,
             { id: demandaId }
         );
 
@@ -204,21 +212,22 @@ export function rotasDetalhesDemanda(app: Express) {
             });
         }
 
-        const usuario = await conn.execute(
-            `SELECT id_usuario FROM usuario WHERE id_usuario = :id`,
-            { id: usuarioId }
-        );
-
-        if (!usuario.rows || usuario.rows.length === 0) {
-            return res.status(400).json({
-                mensagem: "Usuário não encontrado."
-            });
+        if (usuario.perfil !== "Administrador") {
+            const projetoId = (demanda.rows[0] as { projetoId: number }).projetoId;
+            const vinculo = await conn.execute(
+                `SELECT 1 FROM participa
+                 WHERE id_projeto = :projetoId AND id_usuario = :usuarioId AND ativo = 1`,
+                { projetoId, usuarioId: usuario.id }
+            );
+            if (!vinculo.rows || vinculo.rows.length === 0) {
+                return res.status(403).json({ mensagem: "Você não participa do projeto desta demanda." });
+            }
         }
 
         await conn.execute(
             `INSERT INTO comentario (iddemanda, idusuario, texto)
              VALUES (:demandaId, :usuarioId, :texto)`,
-            { demandaId, usuarioId, texto: textoLimpo },
+            { demandaId, usuarioId: usuario.id, texto: textoLimpo },
             { autoCommit: true }
         );
 

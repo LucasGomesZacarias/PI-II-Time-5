@@ -1,0 +1,127 @@
+// Autor: Augusto Henrique Marçura. Edição e histórico no servidor da equipe.
+import { Express } from "express";
+import { Connection } from "oracledb";
+import { getConn } from "../db";
+import { buscarUsuarioLogado } from "../autenticacao";
+import { ehPerfilValido, podeFazer, validarTransicao, Status } from "../permissoes";
+import { buscarFeriadoNacional } from "../feriados";
+import { DemandaEditavel, ErroEdicao, prepararEdicao } from "../edicao/regrasEdicao";
+
+async function participa(conn: Connection, projetoId: number, usuarioId: number): Promise<boolean> {
+    const resultado = await conn.execute(
+        "SELECT 1 FROM participa WHERE id_projeto = :projetoId AND id_usuario = :usuarioId AND ativo = 1",
+        { projetoId, usuarioId }
+    );
+    return !!resultado.rows && resultado.rows.length > 0;
+}
+
+export function rotasEdicaoReal(app: Express) {
+    app.get("/demandas/:id/historico", async (req, res) => {
+        const id = Number(req.params.id);
+        if (!/^\d+$/.test(req.params.id) || !Number.isSafeInteger(id) || id <= 0) {
+            return res.status(400).json({ mensagem: "ID inválido." });
+        }
+        let conn;
+        try {
+            conn = await getConn();
+            const usuario = await buscarUsuarioLogado(conn, req);
+            if (!usuario) return res.status(401).json({ mensagem: "Faça login para ver o histórico." });
+            if (!ehPerfilValido(usuario.perfil) || !podeFazer(usuario.perfil, "ver_historico")) {
+                return res.status(403).json({ mensagem: "Você não tem permissão para ver o histórico." });
+            }
+            const resultado = await conn.execute('SELECT idprojeto AS "projetoId" FROM demanda WHERE id_demanda = :id', { id });
+            if (!resultado.rows || resultado.rows.length === 0) return res.status(404).json({ mensagem: "Demanda não encontrada." });
+            const demanda = resultado.rows[0] as { projetoId: number };
+            if (usuario.perfil !== "Administrador" && !(await participa(conn, demanda.projetoId, usuario.id))) {
+                return res.status(403).json({ mensagem: "Você não participa deste projeto." });
+            }
+            const historico = await conn.execute(
+                `SELECT h.tipo_alteracao AS "campo", h.valor_anterior AS "valorAnterior", h.valor_novo AS "valorNovo",
+                        h.data_hora AS "dataAlteracao", u.nome AS "autor"
+                 FROM historico_demanda h JOIN usuario u ON u.id_usuario = h.idusuario
+                 WHERE h.iddemanda = :id ORDER BY h.data_hora, h.id_historico`, { id }
+            );
+            return res.status(200).json(historico.rows || []);
+        } catch (erro) {
+            console.error(erro);
+            return res.status(500).json({ mensagem: "Erro ao buscar histórico." });
+        } finally {
+            if (conn) await conn.close();
+        }
+    });
+
+    app.put("/demandas/:id", async (req, res) => {
+        const id = Number(req.params.id);
+        if (!/^\d+$/.test(req.params.id) || !Number.isSafeInteger(id) || id <= 0) {
+            return res.status(400).json({ mensagem: "ID inválido." });
+        }
+        let conn;
+        try {
+            conn = await getConn();
+            const usuario = await buscarUsuarioLogado(conn, req);
+            if (!usuario) return res.status(401).json({ mensagem: "Faça login para editar." });
+            if (!ehPerfilValido(usuario.perfil) || !podeFazer(usuario.perfil, "editar_demanda")) {
+                return res.status(403).json({ mensagem: "Você não tem permissão para editar demandas." });
+            }
+            const resultado = await conn.execute(
+                `SELECT titulo AS "titulo", descricao AS "descricao", tipo AS "tipo", prioridade AS "prioridade",
+                        idprojeto AS "projetoId", idusuario AS "responsavelId", TO_CHAR(prazo, 'YYYY-MM-DD') AS "prazo", status AS "status"
+                 FROM demanda WHERE id_demanda = :id FOR UPDATE`, { id }
+            );
+            if (!resultado.rows || resultado.rows.length === 0) return res.status(404).json({ mensagem: "Demanda não encontrada." });
+            const atual = resultado.rows[0] as DemandaEditavel;
+            const vinculado = usuario.perfil === "Administrador" || await participa(conn, atual.projetoId, usuario.id);
+            if (!vinculado) return res.status(403).json({ mensagem: "Você não participa deste projeto." });
+            const entrada = req.body as DemandaEditavel;
+            const preparado = await prepararEdicao(atual, entrada, usuario.id, {
+                projetoExiste: async projetoId => {
+                    const r = await conn!.execute('SELECT id_projeto FROM projeto WHERE id_projeto = :id', { id: projetoId });
+                    return !!r.rows && r.rows.length > 0;
+                },
+                usuarioExiste: async usuarioId => {
+                    const r = await conn!.execute('SELECT id_usuario FROM usuario WHERE id_usuario = :id', { id: usuarioId });
+                    return !!r.rows && r.rows.length > 0;
+                },
+                feriadoNacional: buscarFeriadoNacional
+            });
+            if (usuario.perfil !== "Administrador" && preparado.demanda.projetoId !== atual.projetoId &&
+                !(await participa(conn, preparado.demanda.projetoId, usuario.id))) {
+                return res.status(403).json({ mensagem: "Você não participa do projeto escolhido." });
+            }
+            if (atual.status !== preparado.demanda.status) {
+                const transicao = validarTransicao(usuario.perfil, atual.status as Status, preparado.demanda.status as Status, { vinculadoAoProjeto: vinculado });
+                if (!transicao.permitido) return res.status(403).json({ mensagem: transicao.motivo });
+            }
+            for (const alteracao of preparado.historico) {
+                if (Buffer.byteLength(String(alteracao.anterior ?? ""), "utf8") > 500 || Buffer.byteLength(String(alteracao.novo ?? ""), "utf8") > 500) {
+                    return res.status(400).json({ mensagem: "A alteração é longa demais para o histórico do banco." });
+                }
+            }
+            if (preparado.historico.length === 0) return res.status(200).json({ mensagem: "Nenhum dado foi alterado.", alterada: false });
+            const d = preparado.demanda;
+            await conn.execute(
+                `UPDATE demanda SET titulo = :titulo, descricao = :descricao, tipo = :tipo, prioridade = :prioridade,
+                 idprojeto = :projetoId, idusuario = :responsavelId, prazo = TO_DATE(:prazo, 'YYYY-MM-DD'),
+                 status = :status, data_atualizacao = SYSTIMESTAMP WHERE id_demanda = :id`, { ...d, id }
+            );
+            for (const alteracao of preparado.historico) {
+                await conn.execute(
+                    `INSERT INTO historico_demanda (idusuario, iddemanda, tipo_alteracao, valor_anterior, valor_novo)
+                     VALUES (:usuarioId, :demandaId, :campo, :anterior, :novo)`,
+                    { usuarioId: usuario.id, demandaId: id, campo: alteracao.campo,
+                      anterior: alteracao.anterior === null ? null : String(alteracao.anterior),
+                      novo: alteracao.novo === null ? null : String(alteracao.novo) }
+                );
+            }
+            await conn.commit();
+            return res.status(200).json({ mensagem: "Demanda atualizada com sucesso.", alterada: true });
+        } catch (erro) {
+            if (conn) await conn.rollback();
+            if (erro instanceof ErroEdicao) return res.status(erro.status).json({ mensagem: erro.message });
+            console.error(erro);
+            return res.status(500).json({ mensagem: "Erro ao editar a demanda." });
+        } finally {
+            if (conn) await conn.close();
+        }
+    });
+}

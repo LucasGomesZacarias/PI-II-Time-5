@@ -1,11 +1,7 @@
-# Tela de detalhes da demanda
+# Detalhes, comentários e edição de demandas
 
-Execute o projeto a partir da raiz do repositório com um servidor HTTP estático, por exemplo:
+A tela de detalhes consulta o servidor do projeto em `http://localhost:3000` para mostrar a demanda e os comentários. O envio de comentários usa o usuário identificado pelo login da equipe.
 
-```bash
-python3 -m http.server 8765
-```
+A tela de edição consulta a demanda e envia as alterações ao servidor. Informe os IDs numéricos do projeto e, se houver, do responsável. O servidor valida os dados, verifica o perfil, o vínculo com o projeto e os feriados nacionais. Quando há mudanças, a demanda e o histórico são gravados na mesma transação. O histórico aparece na tela de detalhes para usuários identificados com acesso ao projeto.
 
-Na listagem existente, clique em **Mostrar Demandas ficticias** e abra os detalhes de uma demanda. Os links já existentes levam à tela oficial em `/detalhes_demanda/detalhesDemandas.html?id=1041` ou `?id=1045`. O botão **Editar demanda**, dentro dos detalhes, abre o formulário. Título e descrição são obrigatórios; responsável e prazo podem ficar vazios. **Descartar edição** fecha o formulário sem salvar. O histórico registra alterações salvas.
-
-Os dados de demonstração desta tela estão em `detalhes_demanda/demandasExemplo.js`. As edições ficam no `localStorage` do navegador usado no teste e não atualizam a listagem existente. Este módulo é temporário: ainda não existe API ou banco de dados neste repositório. Autenticação, permissões, cancelamento lógico e validação de prazo contra feriados dependem da integração com o backend prevista no escopo do PI.
+Para testar com o Oracle, é necessário iniciar o backend e ter acesso ao banco. O fluxo atual da equipe identifica o usuário por um ID enviado pelo navegador; esse ID pode ser alterado e ainda não substitui uma sessão autenticada ou token seguro. Os testes locais simulados não comprovam a integração com o banco real.

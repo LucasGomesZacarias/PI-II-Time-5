@@ -2,7 +2,9 @@
 // Integração da tela de detalhes com a API do projeto
 
 const id = new URLSearchParams(window.location.search).get("id");
-const elemento = seletor => document.querySelector(seletor);
+function elemento(seletor) {
+    return document.querySelector(seletor);
+}
 const enderecoApi = "http://localhost:3000";
 
 // Consulta a API e mostra uma mensagem se ocorrer algum erro
@@ -72,15 +74,64 @@ function mostrarHistorico(historico){
     }
 }
 
-// Busca dados reais; a edição e o envio dependem da integração com o login.
+// O login da equipe guarda os dados do usuário nesta aba do navegador.
+function usuarioDaSessao() {
+    try {
+        const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado") || "null");
+        if (usuario && Number.isSafeInteger(usuario.id) && usuario.id > 0) {
+            return usuario;
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+// Busca os dados e permite enviar comentários pelo fluxo atual de login da equipe.
 async function iniciar() {
     const aviso = elemento("#aviso-demanda");
     const formularioComentario = elemento("#formulario-comentario");
-    formularioComentario.addEventListener("submit", evento => evento.preventDefault());
-    formularioComentario.querySelector("button").disabled = true;
-    elemento("#texto-comentario").disabled = true;
+    const botaoComentario = formularioComentario.querySelector("button");
+    const campoComentario = elemento("#texto-comentario");
+    const mensagemComentario = elemento("#erro-comentario");
+    const usuario = usuarioDaSessao();
+    botaoComentario.disabled = true;
+    campoComentario.disabled = true;
     elemento("#botao-editar").disabled = true;
-    elemento("#erro-comentario").textContent = "O envio de comentários depende da integração com o login.";
+    mensagemComentario.textContent = usuario ? "Carregando comentários..." : "Faça login para comentar.";
+
+    formularioComentario.addEventListener("submit", async evento => {
+        evento.preventDefault();
+        if (!usuario) return;
+        const texto = campoComentario.value.trim();
+        if (!texto) {
+            mensagemComentario.textContent = "Escreva um comentário antes de enviar.";
+            campoComentario.focus();
+            return;
+        }
+        botaoComentario.disabled = true;
+        try {
+            const resposta = await fetch(`${enderecoApi}/demandas/${encodeURIComponent(id)}/comentarios`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-usuario-id": String(usuario.id) },
+                body: JSON.stringify({ texto })
+            });
+            const dados = await resposta.json();
+            if (!resposta.ok) throw new Error(dados.mensagem || "Não foi possível enviar o comentário.");
+            campoComentario.value = "";
+            try {
+                const atualizados = await consultarApi(`/demandas/${encodeURIComponent(id)}/comentarios`);
+                mostrarComentario(atualizados);
+                mensagemComentario.textContent = "Comentário enviado.";
+            } catch {
+                mensagemComentario.textContent = "Comentário enviado, mas não foi possível atualizar a lista. Atualize a página.";
+            }
+        } catch (erro) {
+            mensagemComentario.textContent = erro instanceof Error ? erro.message : "Não foi possível enviar o comentário.";
+        } finally {
+            botaoComentario.disabled = false;
+        }
+    });
 
     if (!/^\d+$/.test(id ?? "") || Number(id) <= 0) {
         aviso.textContent = "Informe uma demanda válida na listagem.";
@@ -92,7 +143,10 @@ async function iniciar() {
         const caminho = `/demandas/${encodeURIComponent(id)}`;
         const demanda = await consultarApi(caminho);
         const comentarios = await consultarApi(`${caminho}/comentarios`);
-        const data = valor => valor ? new Date(valor).toLocaleDateString("pt-BR") : "Não definido";
+        function data(valor) {
+            if (!valor) return "Não definido";
+            return new Date(valor).toLocaleDateString("pt-BR");
+        }
         elemento("#codigo-demanda").textContent = `DEM-${demanda.id}`;
         elemento("#titulo-demanda").textContent = demanda.titulo;
         elemento("#status-demanda").textContent = demanda.status;
@@ -105,10 +159,33 @@ async function iniciar() {
         elemento("#atualizacao-demanda").textContent = data(demanda.dataAtualizacao);
         elemento("#prazo-demanda").textContent = data(demanda.prazo);
         mostrarComentario(comentarios);
+        if (usuario) {
+            campoComentario.disabled = false;
+            botaoComentario.disabled = false;
+            mensagemComentario.textContent = "";
+        }
         elemento("#detalhes").hidden = false;
         elemento("#secao-comentarios").hidden = false;
-        aviso.textContent = "Consulta ao banco. A edição ainda está em integração.";
-        aviso.hidden = false;
+        if (usuario) {
+            const botaoEditar = elemento("#botao-editar");
+            if (usuario.perfil === "Administrador" || usuario.perfil === "Líder de Projeto") {
+                botaoEditar.disabled = false;
+                botaoEditar.addEventListener("click", function () {
+                    window.location.href = "/EdicaoDemanda/edicaoDemanda.html?id=" + encodeURIComponent(id);
+                });
+            }
+            elemento("#secao-historico").hidden = false;
+            try {
+                const resposta = await fetch(enderecoApi + caminho + "/historico", {
+                    headers: { "x-usuario-id": String(usuario.id) }
+                });
+                const historico = await resposta.json();
+                if (!resposta.ok) throw new Error(historico.mensagem || "Não foi possível carregar o histórico.");
+                mostrarHistorico(historico);
+            } catch (erro) {
+                elemento("#lista-historico").textContent = erro instanceof Error ? erro.message : "Não foi possível carregar o histórico.";
+            }
+        }
     } catch (erro) {
         aviso.textContent = erro instanceof Error ? erro.message : "Não foi possível carregar a demanda.";
         aviso.hidden = false;

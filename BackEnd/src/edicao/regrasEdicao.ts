@@ -37,7 +37,10 @@ export async function prepararEdicao(atual: DemandaEditavel, entrada: DemandaEdi
         throw new ErroEdicao(400, "Confira o título e a descrição.");
     if (!["Tarefa", "Defeito", "Melhoria", "Documentação"].includes(entrada.tipo) || !["Crítica", "Alta", "Média", "Baixa"].includes(entrada.prioridade))
         throw new ErroEdicao(400, "Tipo ou prioridade inválidos.");
-    if (!transicoes[atual.status]?.includes(entrada.status)) throw new ErroEdicao(400, "Transição de status não permitida.");
+    const proximosStatus = transicoes[atual.status];
+    if (!proximosStatus || !proximosStatus.includes(entrada.status)) {
+        throw new ErroEdicao(400, "Transição de status não permitida.");
+    }
     if (!Number.isSafeInteger(entrada.projetoId) || entrada.projetoId <= 0 || !(await deps.projetoExiste(entrada.projetoId)))
         throw new ErroEdicao(400, "Projeto não encontrado.");
     if (entrada.responsavelId !== null && (!Number.isSafeInteger(entrada.responsavelId) || entrada.responsavelId <= 0 || !(await deps.usuarioExiste(entrada.responsavelId))))
@@ -61,8 +64,17 @@ export async function prepararEdicao(atual: DemandaEditavel, entrada: DemandaEdi
         prazo: entrada.prazo,
         status: entrada.status
     };
-    const historico: Alteracao[] = campos.filter(campo => atual[campo] !== demanda[campo]).map(campo => ({
-        campo, anterior: atual[campo], novo: demanda[campo], usuarioId
-    }));
+    // Compara cada campo e guarda no histórico apenas os que mudaram.
+    const historico: Alteracao[] = [];
+    for (const campo of campos) {
+        if (atual[campo] !== demanda[campo]) {
+            historico.push({
+                campo: campo,
+                anterior: atual[campo],
+                novo: demanda[campo],
+                usuarioId: usuarioId
+            });
+        }
+    }
     return { demanda, historico };
 }

@@ -1,18 +1,16 @@
 // Autor: Felipe Evangelista Cruz e Augusto Henrique Marçura
 
-// importa a busca das demandas de demonstração
-import { buscarDemandaExemplo, salvarDemandaExemplo } from "../detalhes_demanda/demandasExemplo.js";
-
-// identifica a demanda informada no endereço da página
+// A tela busca e salva os dados no servidor do projeto.
+const enderecoApi = "http://localhost:3000";
 const parametros = new URLSearchParams(window.location.search);
 const idDemanda = parametros.get("id");
-
-// procura a demanda pelo ID recebido no endereço
-let demanda = buscarDemandaExemplo(idDemanda);
-console.log("Demanda encontrada:", demanda);
-
-console.log("ID da demanda selecionada:", idDemanda);
-
+let demanda = null;
+let usuario = null;
+try {
+    usuario = JSON.parse(sessionStorage.getItem("usuarioLogado") || "null");
+} catch {
+    usuario = null;
+}
 
 // pega o formulário pelo id
 const formulario = document.querySelector("#formEdicao");
@@ -27,33 +25,42 @@ const campoPrazo = document.querySelector("#prazo");
 const campoStatus = document.querySelector("#status");
 const campoDescricao = document.querySelector("#descricao");
 
-// preenche o formulário com os dados da demanda encontrada
-if (demanda) {
-
-    // exibe as datas da demanda carregada
-    document.querySelector("#dataCriacao").textContent = demanda.dataCriacao;
-    document.querySelector("#dataAtualizada").textContent = demanda.dataAtualizacao;
-
-    campoTitulo.value = demanda.titulo;
-    campoTipo.value = demanda.tipo;
-    campoPrioridade.value = demanda.prioridade;
-    campoResponsavel.value = demanda.responsavel || "";
-    campoAssociado.value = demanda.projeto;
-    campoStatus.value = demanda.status;
-    campoDescricao.value = demanda.descricao;
-
-    // converte a data de dia/mês/ano para o formato aceito pelo campo date
-    if (demanda.prazo) {
-        const [dia, mes, ano] = demanda.prazo.split("/");
-        campoPrazo.value = `${ano}-${mes}-${dia}`;
-    }
-} else {
-    // impede a edição quando não existe uma demanda para o ID informado
+// Carrega os dados antes de permitir a edição.
+async function carregarDemanda() {
     const aviso = document.querySelector("#avisoDemanda");
-    aviso.textContent = "Demanda não encontrada. Volte à listagem e escolha uma demanda válida";
-    aviso.hidden = false;
     formulario.hidden = true;
+    if (!usuario || !Number.isSafeInteger(usuario.id) || usuario.id <= 0) {
+        aviso.textContent = "Faça login para editar a demanda.";
+        aviso.hidden = false;
+        return;
+    }
+    if (!idDemanda || !/^\d+$/.test(idDemanda) || Number(idDemanda) <= 0) {
+        aviso.textContent = "Escolha uma demanda válida na listagem.";
+        aviso.hidden = false;
+        return;
+    }
+    try {
+        const resposta = await fetch(enderecoApi + "/demandas/" + encodeURIComponent(idDemanda));
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(dados.mensagem || "Não foi possível carregar a demanda.");
+        demanda = dados;
+        document.querySelector("#dataCriacao").textContent = demanda.dataCriacao ? new Date(demanda.dataCriacao).toLocaleDateString("pt-BR") : "Não definida";
+        document.querySelector("#dataAtualizada").textContent = demanda.dataAtualizacao ? new Date(demanda.dataAtualizacao).toLocaleDateString("pt-BR") : "Não definida";
+        campoTitulo.value = demanda.titulo;
+        campoTipo.value = demanda.tipo;
+        campoPrioridade.value = demanda.prioridade;
+        campoResponsavel.value = demanda.responsavelId == null ? "" : String(demanda.responsavelId);
+        campoAssociado.value = String(demanda.projetoId);
+        campoStatus.value = demanda.status;
+        campoDescricao.value = demanda.descricao;
+        campoPrazo.value = demanda.prazo ? demanda.prazo.slice(0, 10) : "";
+        formulario.hidden = false;
+    } catch (erro) {
+        aviso.textContent = erro.message || "Não foi possível carregar a demanda.";
+        aviso.hidden = false;
+    }
 }
+carregarDemanda();
 
 // pega cada div onde a mensagem de erro vai aparecer
 const erroTitulo = document.querySelector("#erroTitulo");
@@ -109,7 +116,7 @@ function limparErros() {
 
 
 // executa quando o usuário clica em Salvar
-formulario.addEventListener("submit", function (event) {
+formulario.addEventListener("submit", async function (event) {
     // impede o envio automático do formulário
     event.preventDefault();
     limparErros();
@@ -164,7 +171,8 @@ formulario.addEventListener("submit", function (event) {
         hoje.setHours(0, 0, 0, 0);
         const dataPrazo = new Date(prazo + "T00:00:00");
 
-        if (dataPrazo < hoje) {
+        const prazoAtual = demanda && demanda.prazo ? demanda.prazo.slice(0, 10) : "";
+        if (dataPrazo < hoje && prazo !== prazoAtual) {
             mostrarErro(campoPrazo, erroPrazo, "O prazo não pode ser uma data passada.");
             formValido = false;
         }
@@ -186,9 +194,12 @@ formulario.addEventListener("submit", function (event) {
     };
 
     // impede uma mudança que não esteja no ciclo de vida da demanda
-    if (demanda && !transicoesPermitidas[demanda.status]?.includes(status)) {
-        mostrarErro(campoStatus, erroStatus, "Essa mudança de status não é permitida");
-        formValido = false;
+    if (demanda) {
+        const proximosStatus = transicoesPermitidas[demanda.status];
+        if (!proximosStatus || !proximosStatus.includes(status)) {
+            mostrarErro(campoStatus, erroStatus, "Essa mudança de status não é permitida");
+            formValido = false;
+        }
     }
 
     // descrição: obrigatória, entre 10 e 500 caracteres
@@ -203,67 +214,38 @@ formulario.addEventListener("submit", function (event) {
         formValido = false;
     }
 
-    // só continua quando todos os campos passaram pela validação
-    if (formValido) {
-        const demandaAtualizada = {
-            ...demanda,
-            titulo,
-            tipo,
-            prioridade,
-            responsavel,
-            projeto: associado,
-            prazo: prazo ? prazo.split("-").reverse().join("/") : "",
-            status,
-            descricao,
-            dataAtualizacao: new Date().toLocaleDateString("pt-BR")
-        };
-
-        // compara os dados anteriores com os dados preenchidos
-        const nomesDosCampos = {
-            titulo: "título",
-            tipo: "tipo",
-            prioridade: "prioridade",
-            responsavel: "responsável",
-            projeto: "projeto",
-            prazo: "prazo",
-            status: "status",
-            descricao: "descrição"
-        };
-        const camposAlterados = Object.keys(nomesDosCampos).filter(function (campo) {
-            return (demanda[campo] || "") !== (demandaAtualizada[campo] || "");
-        });
-
-        // não altera a data nem cria histórico se nada mudou
-        if (camposAlterados.length == 0) {
-            window.alert("Nenhum dado foi alterado");
+    // O servidor verifica os dados e grava a demanda junto com seu histórico.
+    if (formValido && demanda && usuario) {
+        const projetoId = Number(associado);
+        const responsavelId = responsavel === "" ? null : Number(responsavel);
+        if (!Number.isSafeInteger(projetoId) || projetoId <= 0) {
+            mostrarErro(campoAssociado, erroAssociado, "Informe um ID de projeto válido.");
             return;
         }
-
-        // registra os valores anteriores e novos na demonstração local
-        const agora = new Date();
-        const dataHora = agora.toLocaleDateString("pt-BR") + " - " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-        const descricaoAlteracoes = camposAlterados.map(function (campo) {
-            const anterior = demanda[campo] || "não definido";
-            const novo = demandaAtualizada[campo] || "não definido";
-            return `${nomesDosCampos[campo]}: ${anterior} → ${novo}`;
-        });
-
-        demandaAtualizada.historico = [
-            ...(demanda.historico || []),
-            {
-                data: dataHora,
-                texto: `Alteração na demonstração local: ${descricaoAlteracoes.join("; ")}`
-            }
-        ];
-
-        // salva a edição apenas no armazenamento deste navegador
-        if (salvarDemandaExemplo(demandaAtualizada)) {
-            demanda = demandaAtualizada;
-            document.querySelector("#dataAtualizada").textContent = demanda.dataAtualizacao;
-            window.alert("Demanda salva neste navegador");
-        } else {
-            window.alert("Não foi possível salvar a demanda neste navegador");
+        if (responsavelId !== null && (!Number.isSafeInteger(responsavelId) || responsavelId <= 0)) {
+            mostrarErro(campoResponsavel, erroResponsavel, "Informe um ID de responsável válido.");
+            return;
+        }
+        const dados = {
+            titulo: titulo, tipo: tipo, prioridade: prioridade, responsavelId: responsavelId,
+            projetoId: projetoId, prazo: prazo || null, status: status, descricao: descricao
+        };
+        const botao = formulario.querySelector('button[type="submit"]');
+        botao.disabled = true;
+        try {
+            const resposta = await fetch(enderecoApi + "/demandas/" + encodeURIComponent(idDemanda), {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", "x-usuario-id": String(usuario.id) },
+                body: JSON.stringify(dados)
+            });
+            const resultado = await resposta.json();
+            if (!resposta.ok) throw new Error(resultado.mensagem || "Não foi possível salvar a demanda.");
+            window.alert(resultado.mensagem);
+            await carregarDemanda();
+        } catch (erro) {
+            window.alert(erro.message || "Não foi possível salvar a demanda.");
+        } finally {
+            botao.disabled = false;
         }
     }
 });
