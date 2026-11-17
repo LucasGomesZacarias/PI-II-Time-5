@@ -50,7 +50,7 @@
 
         try {
             const params = new URLSearchParams(filtros);
-            const resposta = await fetch('/demandas?' + params);
+            const resposta = await fetch('http://localhost:3000/demandas?' + params);
             const dados = await resposta.json();
 
             if (!resposta.ok) {

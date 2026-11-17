@@ -60,7 +60,7 @@ export class FormDemandas extends HTMLElement {
     // preenche o select de projetos com os dados do banco
     async carregarProjetos() {
         try {
-            const resposta = await fetch('/projetos');
+            const resposta = await fetch('http://localhost:3000/projetos');
             if (!resposta.ok) return;
 
             const projetos = await resposta.json();
