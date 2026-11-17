@@ -155,12 +155,25 @@ export function rotasDetalhesDemanda(app: Express) {
         }
 
         // Filtra pela demanda e acrescenta o nome do usuário de teste a cada comentário.
-        const comentarios = comentarioTeste
-            .filter(item => item.demandaId === id)
-            .map(item => ({
-                ...item,
-                autor: usuariosTeste.find(usuario => usuario.id === item.usuarioId)?.nome ?? "Usuário não encontrado"
-            }));
+        const comentarios = [];
+        for (const item of comentarioTeste) {
+            if (item.demandaId === id) {
+                let nomeAutor = "Usuário não encontrado";
+                for (const usuario of usuariosTeste) {
+                    if (usuario.id === item.usuarioId) {
+                        nomeAutor = usuario.nome;
+                        break;
+                    }
+                }
+                comentarios.push({
+                    demandaId: item.demandaId,
+                    usuarioId: item.usuarioId,
+                    texto: item.texto,
+                    dataHora: item.dataHora,
+                    autor: nomeAutor
+                });
+            }
+        }
         return res.status(200).json(comentarios);
     })
 

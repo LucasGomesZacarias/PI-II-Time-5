@@ -74,11 +74,11 @@ export function rotasEdicaoReal(app: Express) {
             if (!vinculado) return res.status(403).json({ mensagem: "Você não participa deste projeto." });
             const entrada = req.body as DemandaEditavel;
             const preparado = await prepararEdicao(atual, entrada, usuario.id, {
-                projetoExiste: async projetoId => {
+                projetoExiste: async function (projetoId) {
                     const r = await conn!.execute('SELECT id_projeto FROM projeto WHERE id_projeto = :id', { id: projetoId });
                     return !!r.rows && r.rows.length > 0;
                 },
-                usuarioExiste: async usuarioId => {
+                usuarioExiste: async function (usuarioId) {
                     const r = await conn!.execute('SELECT id_usuario FROM usuario WHERE id_usuario = :id', { id: usuarioId });
                     return !!r.rows && r.rows.length > 0;
                 },
@@ -92,8 +92,11 @@ export function rotasEdicaoReal(app: Express) {
                 const transicao = validarTransicao(usuario.perfil, atual.status as Status, preparado.demanda.status as Status, { vinculadoAoProjeto: vinculado });
                 if (!transicao.permitido) return res.status(403).json({ mensagem: transicao.motivo });
             }
+            // O banco aceita até 500 bytes em cada valor guardado no histórico.
             for (const alteracao of preparado.historico) {
-                if (Buffer.byteLength(String(alteracao.anterior ?? ""), "utf8") > 500 || Buffer.byteLength(String(alteracao.novo ?? ""), "utf8") > 500) {
+                const anterior = alteracao.anterior === null ? "" : String(alteracao.anterior);
+                const novo = alteracao.novo === null ? "" : String(alteracao.novo);
+                if (Buffer.byteLength(anterior, "utf8") > 500 || Buffer.byteLength(novo, "utf8") > 500) {
                     return res.status(400).json({ mensagem: "A alteração é longa demais para o histórico do banco." });
                 }
             }
@@ -102,7 +105,9 @@ export function rotasEdicaoReal(app: Express) {
             await conn.execute(
                 `UPDATE demanda SET titulo = :titulo, descricao = :descricao, tipo = :tipo, prioridade = :prioridade,
                  idprojeto = :projetoId, idusuario = :responsavelId, prazo = TO_DATE(:prazo, 'YYYY-MM-DD'),
-                 status = :status, data_atualizacao = SYSTIMESTAMP WHERE id_demanda = :id`, { ...d, id }
+                 status = :status, data_atualizacao = SYSTIMESTAMP WHERE id_demanda = :id`,
+                { titulo: d.titulo, descricao: d.descricao, tipo: d.tipo, prioridade: d.prioridade,
+                  projetoId: d.projetoId, responsavelId: d.responsavelId, prazo: d.prazo, status: d.status, id: id }
             );
             for (const alteracao of preparado.historico) {
                 await conn.execute(

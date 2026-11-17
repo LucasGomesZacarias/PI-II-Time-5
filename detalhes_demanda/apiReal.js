@@ -98,9 +98,13 @@ async function iniciar() {
     botaoComentario.disabled = true;
     campoComentario.disabled = true;
     elemento("#botao-editar").disabled = true;
-    mensagemComentario.textContent = usuario ? "Carregando comentários..." : "Faça login para comentar.";
+    if (usuario) {
+        mensagemComentario.textContent = "Carregando comentários...";
+    } else {
+        mensagemComentario.textContent = "Faça login para comentar.";
+    }
 
-    formularioComentario.addEventListener("submit", async evento => {
+    formularioComentario.addEventListener("submit", async function (evento) {
         evento.preventDefault();
         if (!usuario) return;
         const texto = campoComentario.value.trim();
@@ -133,7 +137,7 @@ async function iniciar() {
         }
     });
 
-    if (!/^\d+$/.test(id ?? "") || Number(id) <= 0) {
+    if (!id || !/^\d+$/.test(id) || Number(id) <= 0) {
         aviso.textContent = "Informe uma demanda válida na listagem.";
         aviso.hidden = false;
         return;
