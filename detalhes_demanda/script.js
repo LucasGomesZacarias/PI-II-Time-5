@@ -1,5 +1,5 @@
 // Autor: Augusto Henrique Marçura.
-// Seleciona a demanda da URL e mantém a tela sincronizada com os dados locais.
+// Reunião 4: seleciona a demanda da URL e mantém a tela sincronizada com os dados locais.
 import { buscarDemandaExemplo, salvarDemandaExemplo } from "./demandasExemplo.js";
 
 // Lê o ID no endereço e procura a demanda entre os dados de exemplo
@@ -41,7 +41,7 @@ function mostrarErro(campo, mensagem) {
     elemento(campo.erro).textContent = mensagem;
 }
 
-// Valida todos os campos e bloqueia o salvamento se encontrar algum erro.
+// Reunião 4: valida os campos da edição e bloqueia o salvamento se encontrar algum erro.
 function validarCampos() {
     limparErros();
     let valido = true;
@@ -131,7 +131,7 @@ function preencherRegistros(container, registros, classe, campos) {
     }
 }
 
-// Preenche a tela com os dados, comentários e histórico da demanda
+// Reunião 4: preenche a tela com os dados, comentários e histórico da demanda.
 function renderizar() {
     const campos = {
         "#codigo-demanda": demanda.codigo,
@@ -169,7 +169,7 @@ if (!demanda) {
     }
     renderizar();
 
-    // Valida o comentário antes de permitir o envio
+    // Reunião 4: valida o comentário; o envio ainda depende da integração com a API.
     elemento("#formulario-comentario").addEventListener("submit", evento => {
         evento.preventDefault();
 
@@ -183,10 +183,11 @@ if (!demanda) {
             return;
         }
 
+        // Nesta demonstração, o comentário é validado, mas ainda não é enviado nem salvo.
         mensagem.textContent = "Comentário válido. O envio será integrado à API";
     });
 
-    // Abre o formulário preenchido com os dados atuais da demanda
+    // Reunião 4: abre o formulário preenchido com os dados atuais da demanda.
     elemento("#botao-editar").addEventListener("click", () => {
         elemento("#titulo").value = demanda.titulo;
         elemento("#descricao").value = demanda.descricao;
@@ -197,13 +198,14 @@ if (!demanda) {
         elemento("#titulo").focus();
     });
 
+    // Fecha o formulário sem aplicar as alterações digitadas.
     elemento("#botao-cancelar").addEventListener("click", () => {
         formulario.hidden = true;
         mostrarAviso("");
         elemento("#botao-editar").focus();
     });
 
-    // Valida e salva a edição nos dados de demonstração do navegador
+    // Reunião 4: valida e salva a edição nos dados de demonstração do navegador.
     formulario.addEventListener("submit", evento => {
         evento.preventDefault();
         if (!validarCampos()) return;
@@ -221,10 +223,11 @@ if (!demanda) {
 
         if (!elemento("#prazo").value) alteracoes.prazo = "";
         
-        // Identifica os campos que mudaram para registrar o histórico local
+        // Reunião 4: identifica os campos que mudaram para registrar o histórico local.
         const camposAlterados = Object.entries(alteracoes)
             .filter(([campo, valor]) => demanda[campo] !== valor)
             .map(([campo]) => ({ titulo: "título", descricao: "descrição", responsavel: "responsável", prazo: "prazo" })[campo]);
+        // Sem mudanças, não cria um registro desnecessário no histórico.
         if (camposAlterados.length === 0) {
             formulario.hidden = true;
             elemento("#botao-editar").focus();
