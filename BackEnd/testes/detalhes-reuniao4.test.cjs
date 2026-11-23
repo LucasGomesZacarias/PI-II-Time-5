@@ -1,19 +1,35 @@
 // Autor: Augusto Henrique Marçura. Reunião 4: testes HTTP das rotas de detalhes e comentários.
-const { test, after } = require('node:test');
+const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
-const { spawn } = require('node:child_process');
 const path = require('node:path');
-const port = 31983;
-const arquivo = process.env.DETALHES_SERVIDOR || path.join(__dirname, '../lib/servidorDetalhesReuniao4.js');
-const servidor = spawn(process.execPath, [arquivo], { env: {...process.env, PORT: String(port)}, stdio: 'pipe' });
-const pronto = new Promise((resolve, reject) => {
-    servidor.stdout.once('data', resolve);
-    servidor.once('exit', code => reject(new Error(`Servidor terminou: ${code}`)));
+const express = require('express');
+const diretorio = process.env.BACKEND_COMPILADO || path.join(__dirname, '../lib');
+let servidor;
+let endereco;
+
+// Inicia as rotas em uma porta temporária somente durante os testes.
+before(async () => {
+    process.env.DADOS_EM_MEMORIA = 'true';
+    const app = express();
+    app.use(express.json());
+    require(path.join(diretorio, 'rotas/detalhesDemanda.js')).rotasDetalhesDemanda(app);
+    app.use((erro, _req, res, next) => {
+        if (erro instanceof SyntaxError && 'body' in erro) {
+            return res.status(400).json({ mensagem: 'JSON inválido.' });
+        }
+        next(erro);
+    });
+    servidor = await new Promise(resolve => {
+        const instancia = app.listen(0, '127.0.0.1', () => resolve(instancia));
+    });
+    endereco = `http://127.0.0.1:${servidor.address().port}`;
 });
-after(() => servidor.kill());
+after(() => {
+    delete process.env.DADOS_EM_MEMORIA;
+    if (servidor) servidor.close();
+});
 async function chamar(rota, body) {
-    await pronto;
-    const resposta = await fetch(`http://127.0.0.1:${port}${rota}`, body === undefined ? {} : {
+    const resposta = await fetch(endereco + rota, body === undefined ? {} : {
         method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(body)
     });
     return {status: resposta.status, dados: await resposta.json()};
@@ -38,8 +54,7 @@ test('comentários vinculados à demanda e usuário e validados no servidor', as
     assert.equal(r.status, 200); assert.equal(r.dados.length, 1); assert.equal(r.dados[0].usuarioId, 1);
 });
 test('JSON inválido retorna um erro em JSON', async () => {
-    await pronto;
-    const resposta = await fetch(`http://127.0.0.1:${port}/demandas/1041/comentarios`, {
+    const resposta = await fetch(endereco + '/demandas/1041/comentarios', {
         method: 'POST', headers: {'content-type': 'application/json'}, body: '{'
     });
     assert.equal(resposta.status, 400);
