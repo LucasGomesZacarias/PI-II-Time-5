@@ -4,7 +4,7 @@ import { Express } from "express";
 import { rotasEdicaoReal } from "./edicaoReal";
 import { getConn } from "../db";
 import { buscarUsuarioLogado } from "../autenticacao";
-import { podeFazer } from "../permissoes";
+import { ehPerfilValido, podeFazer } from "../permissoes";
 import { demandasTeste, comentarioTeste, usuariosTeste } from "../dados/dadosTeste";
 
 // Aceita apenas identificadores inteiros positivos.
@@ -112,8 +112,17 @@ export function rotasDetalhesDemanda(app: Express) {
             try {
                 conn = await getConn();
 
+                // A leitura segue as mesmas regras de acesso ao projeto usadas no envio.
+                const usuario = await buscarUsuarioLogado(conn, req);
+                if (!usuario) {
+                    return res.status(401).json({ mensagem: "Faça login para ver os comentários." });
+                }
+                if (!ehPerfilValido(usuario.perfil) || !podeFazer(usuario.perfil, "comentar")) {
+                    return res.status(403).json({ mensagem: "Você não tem permissão para ver os comentários." });
+                }
+
                 const demanda = await conn.execute(
-                    `SELECT id_demanda FROM demanda WHERE id_demanda = :id`,
+                    `SELECT idprojeto AS "projetoId" FROM demanda WHERE id_demanda = :id`,
                     { id }
                 );
 
@@ -121,6 +130,18 @@ export function rotasDetalhesDemanda(app: Express) {
                     return res.status(404).json({
                         mensagem: "Demanda não encontrada"
                     });
+                }
+
+                if (usuario.perfil !== "Administrador") {
+                    const projetoId = (demanda.rows[0] as { projetoId: number }).projetoId;
+                    const vinculo = await conn.execute(
+                        `SELECT 1 FROM participa
+                         WHERE id_projeto = :projetoId AND id_usuario = :usuarioId AND ativo = 1`,
+                        { projetoId, usuarioId: usuario.id }
+                    );
+                    if (!vinculo.rows || vinculo.rows.length === 0) {
+                        return res.status(403).json({ mensagem: "Você não participa do projeto desta demanda." });
+                    }
                 }
 
                 const resultado = await conn.execute(
@@ -210,7 +231,7 @@ export function rotasDetalhesDemanda(app: Express) {
         if (!usuario) {
             return res.status(401).json({ mensagem: "Faça login para comentar." });
         }
-        if (!podeFazer(usuario.perfil, "comentar")) {
+        if (!ehPerfilValido(usuario.perfil) || !podeFazer(usuario.perfil, "comentar")) {
             return res.status(403).json({ mensagem: "Você não tem permissão para comentar." });
         }
 

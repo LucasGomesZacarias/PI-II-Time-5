@@ -8,8 +8,12 @@ function elemento(seletor) {
 const enderecoApi = "http://localhost:3000";
 
 // Consulta a API e mostra uma mensagem se ocorrer algum erro
-async function consultarApi(caminho){
-    const resposta = await fetch(enderecoApi + caminho);
+async function consultarApi(caminho, usuario){
+    const opcoes = {};
+    if (usuario) {
+        opcoes.headers = { "x-usuario-id": String(usuario.id) };
+    }
+    const resposta = await fetch(enderecoApi + caminho, opcoes);
     const dados = await resposta.json();
 
     if(!resposta.ok){
@@ -41,7 +45,7 @@ function mostrarComentario(comentarios){
 
         const data = document.createElement("p");
         data.className = "data";
-        data.textContent = new Date(comentario.dataHora).toLocaleDateString("pt-BR");
+        data.textContent = new Date(comentario.dataHora).toLocaleString("pt-BR");
 
         bloco.append(autor, texto, data);
         lista.append(bloco);
@@ -124,7 +128,7 @@ async function iniciar() {
             if (!resposta.ok) throw new Error(dados.mensagem || "Não foi possível enviar o comentário.");
             campoComentario.value = "";
             try {
-                const atualizados = await consultarApi(`/demandas/${encodeURIComponent(id)}/comentarios`);
+                const atualizados = await consultarApi(`/demandas/${encodeURIComponent(id)}/comentarios`, usuario);
                 mostrarComentario(atualizados);
                 mensagemComentario.textContent = "Comentário enviado.";
             } catch {
@@ -146,7 +150,6 @@ async function iniciar() {
     try {
         const caminho = `/demandas/${encodeURIComponent(id)}`;
         const demanda = await consultarApi(caminho);
-        const comentarios = await consultarApi(`${caminho}/comentarios`);
         function data(valor) {
             if (!valor) return "Não definido";
             return new Date(valor).toLocaleDateString("pt-BR");
@@ -162,14 +165,19 @@ async function iniciar() {
         elemento("#criacao-demanda").textContent = data(demanda.dataCriacao);
         elemento("#atualizacao-demanda").textContent = data(demanda.dataAtualizacao);
         elemento("#prazo-demanda").textContent = data(demanda.prazo);
-        mostrarComentario(comentarios);
-        if (usuario) {
-            campoComentario.disabled = false;
-            botaoComentario.disabled = false;
-            mensagemComentario.textContent = "";
-        }
         elemento("#detalhes").hidden = false;
         elemento("#secao-comentarios").hidden = false;
+        if (usuario) {
+            try {
+                const comentarios = await consultarApi(`${caminho}/comentarios`, usuario);
+                mostrarComentario(comentarios);
+                campoComentario.disabled = false;
+                botaoComentario.disabled = false;
+                mensagemComentario.textContent = "";
+            } catch (erro) {
+                mensagemComentario.textContent = erro instanceof Error ? erro.message : "Não foi possível carregar os comentários.";
+            }
+        }
         if (usuario) {
             const botaoEditar = elemento("#botao-editar");
             if (usuario.perfil === "Administrador" || usuario.perfil === "Líder de Projeto") {
