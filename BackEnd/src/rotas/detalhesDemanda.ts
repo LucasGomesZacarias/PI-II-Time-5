@@ -62,26 +62,37 @@ export function rotasDetalhesDemanda(app: Express) {
             return res.status(200).json(demanda);
         }
 
-        // A consulta ao Oracle foi preparada, mas depende do esquema e da integração da equipe.
+        // Consulta os dados no Oracle e confere o acesso ao projeto.
         let conn;
 
         try {
             conn = await getConn();
+            const usuario = await buscarUsuarioLogado(conn, req);
+            if (!usuario) {
+                return res.status(401).json({ mensagem: "Faça login para ver a demanda." });
+            }
+            if (!ehPerfilValido(usuario.perfil)) {
+                return res.status(403).json({ mensagem: "Você não tem permissão para ver a demanda." });
+            }
 
             const resultado = await conn.execute(
-        `SELECT id_demanda AS "id",
-                titulo AS "titulo",
-                descricao AS "descricao",
-                tipo AS "tipo",
-                prioridade AS "prioridade",
-                status AS "status",
-                idprojeto AS "projetoId",
-                idusuario AS "responsavelId",
-                prazo AS "prazo",
-                data_criacao AS "dataCriacao",
-                data_atualizacao AS "dataAtualizacao"
-        FROM demanda
-        WHERE id_demanda = :id`,
+        `SELECT d.id_demanda AS "id",
+                d.titulo AS "titulo",
+                d.descricao AS "descricao",
+                d.tipo AS "tipo",
+                d.prioridade AS "prioridade",
+                d.status AS "status",
+                d.idprojeto AS "projetoId",
+                d.idusuario AS "responsavelId",
+                p.nome AS "projetoNome",
+                u.nome AS "responsavelNome",
+                d.prazo AS "prazo",
+                d.data_criacao AS "dataCriacao",
+                d.data_atualizacao AS "dataAtualizacao"
+        FROM demanda d
+        JOIN projeto p ON p.id_projeto = d.idprojeto
+        LEFT JOIN usuario u ON u.id_usuario = d.idusuario
+        WHERE d.id_demanda = :id`,
             { id }
             );
 
@@ -89,7 +100,19 @@ export function rotasDetalhesDemanda(app: Express) {
                 return res.status(404).json({ mensagem: "Demanda não encontrada" });
             }
 
-            return res.status(200).json(resultado.rows[0]);
+            const demanda = resultado.rows[0] as { projetoId: number };
+            if (usuario.perfil !== "Administrador") {
+                const vinculo = await conn.execute(
+                    `SELECT 1 FROM participa
+                     WHERE id_projeto = :projetoId AND id_usuario = :usuarioId AND ativo = 1`,
+                    { projetoId: demanda.projetoId, usuarioId: usuario.id }
+                );
+                if (!vinculo.rows || vinculo.rows.length === 0) {
+                    return res.status(403).json({ mensagem: "Você não participa do projeto desta demanda." });
+                }
+            }
+
+            return res.status(200).json(demanda);
         } catch (erro) {
             console.error(erro);
             return res.status(500).json({ mensagem: "Erro ao buscar a demanda "});

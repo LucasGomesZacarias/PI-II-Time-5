@@ -24,6 +24,7 @@ async function abrir(responsavelId, respostaStatus) {
         sessionStorage: { getItem() { return JSON.stringify({ id: 2, perfil: 'Membro da Equipe' }); } },
         document: { querySelector: el, createElement() { return { textContent: '', append() {} }; } },
         fetch: async (url, opcoes) => {
+            if (url.endsWith('/sessao')) return { ok: true, json: async () => ({ id: 2, perfil: 'Membro da Equipe' }) };
             if (opcoes && opcoes.method === 'PATCH') {
                 envios.push(opcoes);
                 return { ok: respostaStatus.status < 400, json: async () => respostaStatus.dados };
@@ -41,7 +42,7 @@ test('membro responsável consegue solicitar apenas o próximo status', async ()
     assert.equal(tela.el('#secao-status').hidden, false);
     assert.equal(tela.el('#novo-status').value, 'Em andamento');
     await tela.el('#formulario-status').submit({ preventDefault() {} });
-    assert.equal(tela.envios[0].headers['x-usuario-id'], '2');
+    assert.equal(tela.envios[0].headers['x-usuario-id'], undefined);
     assert.equal(JSON.parse(tela.envios[0].body).status, 'Em andamento');
     assert.equal(tela.atualizou(), true);
 });

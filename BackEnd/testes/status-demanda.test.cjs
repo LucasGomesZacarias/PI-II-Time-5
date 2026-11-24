@@ -3,9 +3,11 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const express = require('express');
+const session = require('express-session');
 const banco = require(path.join(process.env.BACKEND_COMPILADO, 'db.js'));
 let servidor, endereco, operacoes = [];
 let falharHistorico = false;
+const cookies = {};
 const perfis = { 1: 'Administrador', 2: 'Membro da Equipe', 3: 'Membro da Equipe', 4: 'Líder de Projeto', 5: 'Líder de Projeto' };
 banco.getConn = async () => ({
     async execute(sql, dados) {
@@ -22,14 +24,24 @@ banco.getConn = async () => ({
 });
 before(async () => {
     const app = express(); app.use(express.json());
+    app.use(session({ secret: 'segredo-exclusivo-para-testes-locais', resave: false, saveUninitialized: false }));
+    app.post('/login-teste/:id', (req, res) => {
+        const id = Number(req.params.id);
+        req.session.usuario = { id, perfil: perfis[id] };
+        res.json({ ok: true });
+    });
     require(path.join(process.env.BACKEND_COMPILADO, 'rotas/edicaoReal.js')).rotasEdicaoReal(app);
     servidor = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
     endereco = 'http://127.0.0.1:' + servidor.address().port;
+    for (const id of [1, 2, 3, 4, 5]) {
+        const resposta = await fetch(endereco + '/login-teste/' + id, { method: 'POST' });
+        cookies[id] = resposta.headers.get('set-cookie').split(';')[0];
+    }
 });
 after(() => servidor.close());
 async function mudar(usuario, status, extras = {}) {
     const headers = { 'content-type': 'application/json' };
-    if (usuario) headers['x-usuario-id'] = String(usuario);
+    if (usuario) headers.cookie = cookies[usuario];
     return fetch(endereco + '/demandas/1/status', { method: 'PATCH', headers, body: JSON.stringify({ ...extras, status }) });
 }
 test('membro responsável avança status e gera histórico', async () => {

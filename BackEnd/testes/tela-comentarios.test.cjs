@@ -26,6 +26,9 @@ async function abrirTela(usuario, respostaPost = { status: 201, dados: { mensage
         document: { querySelector: el, createElement() { return { textContent: "", children: [], append(...itens) { this.children.push(...itens); } }; } },
         fetch: async (url, opcoes) => {
             consultas.push({ url, opcoes });
+            if (url.endsWith('/sessao')) {
+                return { ok: !!usuario, json: async () => usuario || { mensagem: 'Faça login' } };
+            }
             if (opcoes && opcoes.method === "POST") {
                 envios.push(opcoes);
                 return { ok: respostaPost.status < 400, json: async () => respostaPost.dados };
@@ -33,7 +36,7 @@ async function abrirTela(usuario, respostaPost = { status: 201, dados: { mensage
             if (url.endsWith("/comentarios") && respostaLista) {
                 return { ok: respostaLista.status < 400, json: async () => respostaLista.dados };
             }
-            return { ok: true, json: async () => url.endsWith("/comentarios") ? [] : { id: 1, titulo: "Demanda" } };
+            return { ok: true, json: async () => url.endsWith("/comentarios") ? [] : { id: 1, titulo: "Demanda", projetoNome: "Projeto Nexo", responsavelNome: "Maria" } };
         }
     };
     vm.runInNewContext(codigo, contexto);
@@ -64,13 +67,15 @@ test("mostra data e horário de cada comentário", async () => {
 test("com login, envia o texto e identifica o usuário pelo fluxo da equipe", async () => {
     const { el, envios, consultas } = await abrirTela({ id: 7 });
     assert.equal(el("#texto-comentario").disabled, false);
+    assert.equal(el("#projeto-demanda").textContent, "Projeto Nexo");
+    assert.equal(el("#responsavel-demanda").textContent, "Maria");
     el("#texto-comentario").value = " Meu comentário ";
     await el("#formulario-comentario").enviar({ preventDefault() {} });
-    assert.equal(envios[0].headers["x-usuario-id"], "7");
+    assert.equal(envios[0].headers["x-usuario-id"], undefined);
     const consultasComentarios = consultas.filter(item => item.url.endsWith('/comentarios') && (!item.opcoes || item.opcoes.method !== 'POST'));
     assert.ok(consultasComentarios.length >= 2);
-    assert.equal(consultasComentarios[0].opcoes.headers['x-usuario-id'], '7');
-    assert.equal(consultasComentarios[1].opcoes.headers['x-usuario-id'], '7');
+    assert.equal(consultasComentarios[0].opcoes, undefined);
+    assert.equal(consultasComentarios[1].opcoes, undefined);
     assert.deepEqual(JSON.parse(envios[0].body), { texto: "Meu comentário" });
     assert.equal(el("#texto-comentario").value, "");
 });

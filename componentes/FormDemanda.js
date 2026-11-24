@@ -20,8 +20,10 @@ export class FormDemandas extends HTMLElement {
             <select aria-label="Filtrar por status">
                 <option value="">Todos os Status</option>
                 <option value="Aberta">Aberta</option>
-                <option value="Em andamento">Em Andamento</option>
+                <option value="Em andamento">Em andamento</option>
+                <option value="Em revisão">Em revisão</option>
                 <option value="Concluída">Concluída</option>
+                <option value="Cancelada">Cancelada</option>
             </select>
             <select aria-label="Filtrar por prioridade">
                 <option value="">Todas as Prioridades</option>
@@ -31,10 +33,7 @@ export class FormDemandas extends HTMLElement {
                 <option value="Baixa">Baixa</option>
             </select>
             <select aria-label="Filtrar por responsável">
-                <option value="">Todos os Responsáveis</option>
-                <option value="1">Ana Ferreira</option>
-                <option value="2">Caio Lima</option>
-                <option value="3">Bruno Costa</option>
+                <option value="">Carregando responsáveis...</option>
             </select>
             <select aria-label="Ordenar por">
                 <option value="dataCriacao:desc">Mais recentes</option>
@@ -55,6 +54,7 @@ export class FormDemandas extends HTMLElement {
     async connectedCallback() {
         iniciarValidacaoFiltros(this.shadowRoot);
         await this.carregarProjetos();
+        await this.carregarResponsaveis();
     }
 
     // preenche o select de projetos com os dados do banco
@@ -73,6 +73,31 @@ export class FormDemandas extends HTMLElement {
                 select.appendChild(opcao);
             });
         } catch (erro) {
+            console.error(erro);
+        }
+    }
+
+    // Os responsáveis são os usuários cadastrados no banco do projeto.
+    async carregarResponsaveis() {
+        const select = this.shadowRoot.querySelector('select[aria-label="Filtrar por responsável"]');
+        try {
+            const resposta = await fetch('http://localhost:3000/usuarios');
+            if (!resposta.ok) throw new Error('Erro ao carregar responsáveis');
+            const usuarios = await resposta.json();
+            select.textContent = '';
+            const todos = document.createElement('option');
+            todos.value = '';
+            todos.textContent = 'Todos os Responsáveis';
+            select.appendChild(todos);
+            for (const usuario of usuarios) {
+                const opcao = document.createElement('option');
+                opcao.value = usuario.id;
+                opcao.textContent = usuario.nome;
+                select.appendChild(opcao);
+            }
+        } catch (erro) {
+            select.disabled = true;
+            select.options[0].textContent = 'Não foi possível carregar os responsáveis';
             console.error(erro);
         }
     }

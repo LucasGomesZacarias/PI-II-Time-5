@@ -1,11 +1,13 @@
-// Exercita as rotas sem gravar no Oracle.
+// Autor: Augusto Henrique Marçura. Exercita as rotas sem gravar no Oracle.
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const express = require('express');
+const session = require('express-session');
 const base = process.env.BACKEND_COMPILADO;
 const banco = require(path.join(base, 'db.js'));
 let gravacoes = [], falharHistorico = false, servidor, endereco;
+const cookies = {};
 const atual = { titulo: 'Demanda original', descricao: 'Descrição da demanda', tipo: 'Tarefa', prioridade: 'Alta', projetoId: 1, responsavelId: 2, prazo: null, status: 'Aberta' };
 banco.getConn = async () => ({
     async execute(sql, valores) {
@@ -25,14 +27,24 @@ banco.getConn = async () => ({
 });
 before(async () => {
     const app = express(); app.use(express.json());
+    app.use(session({ secret: 'segredo-exclusivo-para-testes-locais', resave: false, saveUninitialized: false }));
+    app.post('/login-teste/:id', (req, res) => {
+        const id = Number(req.params.id);
+        req.session.usuario = { id, perfil: id === 1 ? 'Administrador' : 'Membro da Equipe' };
+        res.json({ ok: true });
+    });
     require(path.join(base, 'rotas/edicaoReal.js')).rotasEdicaoReal(app);
     servidor = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
     endereco = 'http://127.0.0.1:' + servidor.address().port;
+    for (const id of [1, 2]) {
+        const resposta = await fetch(endereco + '/login-teste/' + id, { method: 'POST' });
+        cookies[id] = resposta.headers.get('set-cookie').split(';')[0];
+    }
 });
 after(() => servidor.close());
 async function editar(idUsuario) {
     const headers = { 'Content-Type': 'application/json' };
-    if (idUsuario) headers['x-usuario-id'] = String(idUsuario);
+    if (idUsuario) headers.cookie = cookies[idUsuario];
     return fetch(endereco + '/demandas/1', { method: 'PUT', headers, body: JSON.stringify({ ...atual, titulo: 'Novo título' }) });
 }
 test('edição exige identificação e perfil permitido', async () => {
@@ -48,6 +60,6 @@ test('desfaz alteração se o histórico falhar', async () => {
 });
 test('histórico exige identificação e retorna registros ao administrador', async () => {
     assert.equal((await fetch(endereco + '/demandas/1/historico')).status, 401);
-    const resposta = await fetch(endereco + '/demandas/1/historico', { headers: { 'x-usuario-id': '1' } });
+    const resposta = await fetch(endereco + '/demandas/1/historico', { headers: { cookie: cookies[1] } });
     assert.equal(resposta.status, 200); assert.equal((await resposta.json())[0].campo, 'titulo');
 });

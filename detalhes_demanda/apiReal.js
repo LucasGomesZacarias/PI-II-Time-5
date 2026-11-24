@@ -156,8 +156,8 @@ async function iniciar() {
         elemento("#prioridade-demanda").textContent = demanda.prioridade;
         elemento("#tipo-demanda").textContent = demanda.tipo;
         elemento("#descricao-demanda").textContent = demanda.descricao;
-        elemento("#projeto-demanda").textContent = demanda.projetoId != null ? `Projeto ${demanda.projetoId}` : "Não definido";
-        elemento("#responsavel-demanda").textContent = demanda.responsavelId != null ? `Usuário ${demanda.responsavelId}` : "Não definido";
+        elemento("#projeto-demanda").textContent = demanda.projetoNome || demanda.projeto || "Não definido";
+        elemento("#responsavel-demanda").textContent = demanda.responsavelNome || demanda.responsavel || "Não atribuído";
         elemento("#criacao-demanda").textContent = data(demanda.dataCriacao);
         elemento("#atualizacao-demanda").textContent = data(demanda.dataAtualizacao);
         elemento("#prazo-demanda").textContent = data(demanda.prazo);

@@ -1,4 +1,4 @@
-// Testa o formulário com respostas simuladas da API.
+// Autor: Augusto Henrique Marçura. Testa o formulário com respostas simuladas da API.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -21,6 +21,7 @@ test('carrega a demanda e envia alterações para o servidor', async () => {
         sessionStorage: { getItem: () => JSON.stringify({ id: 1 }) },
         document: { querySelector: elemento, createElement: () => ({}) },
         fetch: async (url, opcoes) => {
+            if (url.endsWith('/sessao')) return { ok: true, json: async () => ({ id: 1, perfil: 'Administrador' }) };
             if (opcoes && opcoes.method === 'PUT') { envios.push({ url, opcoes }); return { ok: true, json: async () => ({ mensagem: 'Salvo' }) }; }
             if (url.endsWith('/projetos/resumo')) return { ok: true, json: async () => [{ id: 1, nome: 'Projeto Nexo' }] };
             if (url.endsWith('/usuarios')) return { ok: true, json: async () => [{ id: 2, nome: 'Maria' }] };
@@ -35,7 +36,7 @@ test('carrega a demanda e envia alterações para o servidor', async () => {
     elemento('#titulo').value = 'Título alterado';
     await elemento('#formEdicao').submit({ preventDefault() {} });
     assert.equal(envios.length, 1);
-    assert.equal(envios[0].opcoes.headers['x-usuario-id'], '1');
+    assert.equal(envios[0].opcoes.headers['x-usuario-id'], undefined);
     assert.equal(JSON.parse(envios[0].opcoes.body).titulo, 'Título alterado');
     assert.deepEqual(alertas, ['Salvo']);
 });
