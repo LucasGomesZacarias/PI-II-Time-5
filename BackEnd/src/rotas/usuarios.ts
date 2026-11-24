@@ -2,6 +2,7 @@
 import { Express, Request, Response } from "express";
 import { getConn } from "../db";
 import bcrypt from "bcryptjs";
+import { exigirLogin } from "../autenticacao";
 
 // mesmas regras de e-mail e senha da tela de login (script.js), repetidas aqui
 // porque a validação do servidor não pode depender do navegador
@@ -58,7 +59,23 @@ export function rotasUsuarios(app: Express) {
             // a senha e o status não saem na resposta
             const { senha: _senha, status: _status, ...usuarioSemSenha } = usuario;
 
-            return res.status(200).json(usuarioSemSenha);
+            // cria outra sessão (novo identificador) depois do login
+            return req.session.regenerate((erro) => {
+                if (erro) {
+                    return res.status(500).json({ mensagem: "Erro ao fazer login" });
+                }
+
+                // guarda quem entrou na sessão (sem a senha)
+                req.session.usuario = usuarioSemSenha;
+
+                // espera gravar a sessão antes da tela abrir a próxima página
+                return req.session.save((erro) => {
+                    if (erro) {
+                        return res.status(500).json({ mensagem: "Erro ao fazer login" });
+                    }
+                    return res.status(200).json(req.session.usuario);
+                });
+            });
         } catch (erro) {
             console.error(erro);
             return res.status(500).json({ mensagem: "Erro ao fazer login" });
@@ -66,6 +83,22 @@ export function rotasUsuarios(app: Express) {
             // devolve a conexão para o pool
             if (conn) await conn.close();
         }
+    });
+
+    // devolve quem está logado (a tela usa para mostrar o nome)
+    app.get("/sessao", exigirLogin, (req: Request, res: Response) => {
+        return res.json(req.session.usuario);
+    });
+
+    // encerra a sessão e apaga o cookie
+    app.post("/logout", exigirLogin, (req: Request, res: Response) => {
+        req.session.destroy((erro) => {
+            if (erro) {
+                return res.status(500).json({ mensagem: "Erro ao sair" });
+            }
+            res.clearCookie("nexo.sid");
+            return res.json({ mensagem: "Sessão encerrada." });
+        });
     });
 
     // lista os usuários pré-cadastrados (sem a senha)

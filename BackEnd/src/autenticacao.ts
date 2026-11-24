@@ -1,5 +1,5 @@
 // Autor: Luiz Felipe da Conceição
-import { Request } from "express";
+import { Request, Response, NextFunction } from "express";
 import { Connection } from "oracledb";
 import { Perfil } from "./permissoes";
 
@@ -10,20 +10,23 @@ export interface UsuarioLogado {
     perfil: Perfil;
 }
 
-// descobre quem está chamando a API pelo header x-usuario-id (a tela manda o id guardado no login).
-// O perfil sempre vem do banco, nunca da requisição. Devolve null se o id faltar ou não existir.
-export async function buscarUsuarioLogado(conn: Connection, req: Request): Promise<UsuarioLogado | null> {
-    const id = Number(req.header("x-usuario-id"));
-
-    if (!Number.isInteger(id) || id <= 0) {
-        return null;
+// ensina ao TypeScript qual informação guardamos na sessão (igual na aula)
+declare module "express-session" {
+    interface SessionData {
+        usuario?: UsuarioLogado;
     }
+}
 
-    const result = await conn.execute(
-        `SELECT id_usuario as "id", nome as "nome", email as "email", perfil as "perfil"
-         FROM Usuario WHERE id_usuario = :id`,
-        { id }
-    );
+// barra a rota se a pessoa não fez login (igual ao exigirLogin da aula)
+export function exigirLogin(req: Request, res: Response, next: NextFunction) {
+    if (!req.session.usuario) {
+        return res.status(401).json({ mensagem: "Faça login para continuar" });
+    }
+    return next();
+}
 
-    return (result.rows?.[0] as UsuarioLogado | undefined) ?? null;
+// descobre quem está chamando a API: agora vem da sessão (cookie), e não do header x-usuario-id.
+// Devolve null se a pessoa não fez login.
+export async function buscarUsuarioLogado(conn: Connection, req: Request): Promise<UsuarioLogado | null> {
+    return req.session.usuario ?? null;
 }
