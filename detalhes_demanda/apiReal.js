@@ -167,6 +167,36 @@ async function iniciar() {
         elemento("#prazo-demanda").textContent = data(demanda.prazo);
         elemento("#detalhes").hidden = false;
         elemento("#secao-comentarios").hidden = false;
+        if (usuario && usuario.perfil === "Membro da Equipe" && demanda.responsavelId === usuario.id) {
+            let proximoStatus = "";
+            if (demanda.status === "Aberta") proximoStatus = "Em andamento";
+            if (demanda.status === "Em andamento") proximoStatus = "Em revisão";
+            if (proximoStatus) {
+                const opcao = document.createElement("option");
+                opcao.value = proximoStatus;
+                opcao.textContent = proximoStatus;
+                elemento("#novo-status").append(opcao);
+                elemento("#secao-status").hidden = false;
+                elemento("#formulario-status").addEventListener("submit", async function (evento) {
+                    evento.preventDefault();
+                    const botao = elemento("#formulario-status").querySelector("button");
+                    botao.disabled = true;
+                    try {
+                        const resposta = await fetch(enderecoApi + caminho + "/status", {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json", "x-usuario-id": String(usuario.id) },
+                            body: JSON.stringify({ status: elemento("#novo-status").value })
+                        });
+                        const resultado = await resposta.json();
+                        if (!resposta.ok) throw new Error(resultado.mensagem || "Não foi possível atualizar o status.");
+                        window.location.reload();
+                    } catch (erro) {
+                        elemento("#mensagem-status").textContent = erro instanceof Error ? erro.message : "Não foi possível atualizar o status.";
+                        botao.disabled = false;
+                    }
+                });
+            }
+        }
         if (usuario) {
             try {
                 const comentarios = await consultarApi(`${caminho}/comentarios`, usuario);

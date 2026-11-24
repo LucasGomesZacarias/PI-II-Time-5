@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script type="module" src="/componentes/libComps.js"></script>
-    <script type="module" src="inicializacao.js"></script>
+    <script type="module" src="inicializacao.js?v=2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -66,6 +66,17 @@
                     <button class="botao" type="submit">Salvar alterações</button>
                     <button id="botao-cancelar" class="botao botao-secundario" type="button">Descartar edição</button>
                 </div>
+            </form>
+        </section>
+
+        <!-- Membros podem avançar o status das demandas atribuídas a eles. -->
+        <section id="secao-status" hidden>
+            <h3>Atualizar status</h3>
+            <form id="formulario-status">
+                <label for="novo-status">Novo status</label>
+                <select id="novo-status" required></select>
+                <button class="botao" type="submit">Atualizar status</button>
+                <p id="mensagem-status" role="status"></p>
             </form>
         </section>
 

@@ -44,6 +44,33 @@ async function carregarDemanda() {
         const dados = await resposta.json();
         if (!resposta.ok) throw new Error(dados.mensagem || "Não foi possível carregar a demanda.");
         demanda = dados;
+        // Busca os nomes dos projetos e usuários para preencher as opções.
+        const respostaProjetos = await fetch(enderecoApi + "/projetos/resumo", {
+            headers: { "x-usuario-id": String(usuario.id) }
+        });
+        const projetos = await respostaProjetos.json();
+        if (!respostaProjetos.ok) throw new Error(projetos.mensagem || "Não foi possível carregar os projetos.");
+        const respostaUsuarios = await fetch(enderecoApi + "/usuarios");
+        const usuarios = await respostaUsuarios.json();
+        if (!respostaUsuarios.ok) throw new Error(usuarios.mensagem || "Não foi possível carregar os usuários.");
+        campoAssociado.textContent = "";
+        campoResponsavel.textContent = "";
+        const semResponsavel = document.createElement("option");
+        semResponsavel.value = "";
+        semResponsavel.textContent = "Sem responsável";
+        campoResponsavel.append(semResponsavel);
+        for (const projeto of projetos) {
+            const opcao = document.createElement("option");
+            opcao.value = String(projeto.id);
+            opcao.textContent = projeto.nome;
+            campoAssociado.append(opcao);
+        }
+        for (const pessoa of usuarios) {
+            const opcao = document.createElement("option");
+            opcao.value = String(pessoa.id);
+            opcao.textContent = pessoa.nome;
+            campoResponsavel.append(opcao);
+        }
         document.querySelector("#dataCriacao").textContent = demanda.dataCriacao ? new Date(demanda.dataCriacao).toLocaleDateString("pt-BR") : "Não definida";
         document.querySelector("#dataAtualizada").textContent = demanda.dataAtualizacao ? new Date(demanda.dataAtualizacao).toLocaleDateString("pt-BR") : "Não definida";
         campoTitulo.value = demanda.titulo;
@@ -51,6 +78,9 @@ async function carregarDemanda() {
         campoPrioridade.value = demanda.prioridade;
         campoResponsavel.value = demanda.responsavelId == null ? "" : String(demanda.responsavelId);
         campoAssociado.value = String(demanda.projetoId);
+        if (campoAssociado.value === "") {
+            throw new Error("Você não tem acesso ao projeto desta demanda.");
+        }
         campoStatus.value = demanda.status;
         campoDescricao.value = demanda.descricao;
         campoPrazo.value = demanda.prazo ? demanda.prazo.slice(0, 10) : "";

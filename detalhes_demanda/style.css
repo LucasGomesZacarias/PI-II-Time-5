@@ -252,6 +252,22 @@ section p {
     width: 45%;
 }
 
+#formulario-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+#novo-status {
+    padding: 9px;
+    border: 1px solid #454255;
+    border-radius: 6px;
+    background-color: #1e1d29;
+    color: #edecf3;
+    font: inherit;
+}
+
 .comentarios h3 {
     margin-top: 0;
     font-size: 18px;
