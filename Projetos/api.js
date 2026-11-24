@@ -6,7 +6,7 @@
   Backend esperado:
   http://localhost:3000
 
-  Rotas usadas por esta tela (todas enviam o header x-usuario-id):
+  Rotas usadas por esta tela (o servidor sabe quem é pelo cookie da sessão):
   GET   /projetos/resumo
   POST  /projetos
   GET   /projetos/:id/membros
@@ -16,17 +16,6 @@
 */
 
 const API_BASE_URL = "http://localhost:3000";
-
-// chave onde a tela de login guardou o usuário (sessionStorage)
-const CHAVE_USUARIO_LOGADO = "usuarioLogado";
-
-function lerUsuarioLogado() {
-  try {
-    return JSON.parse(sessionStorage.getItem(CHAVE_USUARIO_LOGADO));
-  } catch (erro) {
-    return null;
-  }
-}
 
 async function tratarRespostaApi(resposta) {
   const dados = await resposta.json();
@@ -44,13 +33,9 @@ async function tratarRespostaApi(resposta) {
 }
 
 async function chamarApi(caminho, metodo = "GET", corpo = null) {
-  const usuario = lerUsuarioLogado();
-
   const opcoes = {
     method: metodo,
-    headers: {
-      "x-usuario-id": usuario ? usuario.id : ""
-    }
+    headers: {}
   };
 
   if (corpo) {

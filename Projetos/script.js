@@ -10,30 +10,8 @@
   - adicionar e remover pessoas (só líder ou administrador)
 */
 
-const PAGINA_LOGIN = "../telaLogin/index.html";
-
 // id do projeto cuja lista de pessoas está aberta no modal
 let projetoAberto = null;
-
-// sem login não há tela: volta para o login. Com login, mostra o nome na barra de navegação.
-// (isto roda antes do componente da barra ser criado, por isso os atributos já entram prontos)
-const usuarioLogado = lerUsuarioLogado();
-
-if (!usuarioLogado) {
-  window.location.href = PAGINA_LOGIN;
-} else {
-  definirUsuarioNaNavbar(usuarioLogado);
-}
-
-function definirUsuarioNaNavbar(usuario) {
-  const partes = usuario.nome.trim().split(/\s+/);
-  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : "";
-  const iniciais = (partes[0][0] + ultima).toUpperCase();
-
-  const navbar = document.querySelector("comp-navbar");
-  navbar.setAttribute("nome", usuario.nome);
-  navbar.setAttribute("iniciais", iniciais);
-}
 
 // nomes vêm de usuários: escapa antes de colocar no HTML
 function escaparHtml(texto) {
@@ -296,7 +274,5 @@ function exibirMensagemMembros(tipo, mensagem) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  if (usuarioLogado) {
-    carregarProjetos();
-  }
+  carregarProjetos();
 });

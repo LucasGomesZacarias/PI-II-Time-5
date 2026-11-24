@@ -6,10 +6,18 @@ const parametros = new URLSearchParams(window.location.search);
 const idDemanda = parametros.get("id");
 let demanda = null;
 let usuario = null;
-try {
-    usuario = JSON.parse(sessionStorage.getItem("usuarioLogado") || "null");
-} catch {
-    usuario = null;
+
+// Pergunta ao servidor quem está logado (a sessão fica no servidor, igual na aula).
+async function buscarSessao() {
+    try {
+        const resposta = await fetch(enderecoApi + "/sessao");
+        if (!resposta.ok) {
+            return null;
+        }
+        return await resposta.json();
+    } catch {
+        return null;
+    }
 }
 
 // pega o formulário pelo id
@@ -29,6 +37,7 @@ const campoDescricao = document.querySelector("#descricao");
 async function carregarDemanda() {
     const aviso = document.querySelector("#avisoDemanda");
     formulario.hidden = true;
+    usuario = await buscarSessao();
     if (!usuario || !Number.isSafeInteger(usuario.id) || usuario.id <= 0) {
         aviso.textContent = "Faça login para editar a demanda.";
         aviso.hidden = false;
@@ -235,7 +244,7 @@ formulario.addEventListener("submit", async function (event) {
         try {
             const resposta = await fetch(enderecoApi + "/demandas/" + encodeURIComponent(idDemanda), {
                 method: "PUT",
-                headers: { "Content-Type": "application/json", "x-usuario-id": String(usuario.id) },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dados)
             });
             const resultado = await resposta.json();

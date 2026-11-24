@@ -74,14 +74,14 @@ function mostrarHistorico(historico){
     }
 }
 
-// O login da equipe guarda os dados do usuário nesta aba do navegador.
-function usuarioDaSessao() {
+// Pergunta ao servidor quem está logado (a sessão fica no servidor, igual na aula).
+async function usuarioDaSessao() {
     try {
-        const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado") || "null");
-        if (usuario && Number.isSafeInteger(usuario.id) && usuario.id > 0) {
-            return usuario;
+        const resposta = await fetch(enderecoApi + "/sessao");
+        if (!resposta.ok) {
+            return null;
         }
-        return null;
+        return await resposta.json();
     } catch {
         return null;
     }
@@ -94,7 +94,7 @@ async function iniciar() {
     const botaoComentario = formularioComentario.querySelector("button");
     const campoComentario = elemento("#texto-comentario");
     const mensagemComentario = elemento("#erro-comentario");
-    const usuario = usuarioDaSessao();
+    const usuario = await usuarioDaSessao();
     botaoComentario.disabled = true;
     campoComentario.disabled = true;
     elemento("#botao-editar").disabled = true;
@@ -117,7 +117,7 @@ async function iniciar() {
         try {
             const resposta = await fetch(`${enderecoApi}/demandas/${encodeURIComponent(id)}/comentarios`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "x-usuario-id": String(usuario.id) },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ texto })
             });
             const dados = await resposta.json();
@@ -180,9 +180,7 @@ async function iniciar() {
             }
             elemento("#secao-historico").hidden = false;
             try {
-                const resposta = await fetch(enderecoApi + caminho + "/historico", {
-                    headers: { "x-usuario-id": String(usuario.id) }
-                });
+                const resposta = await fetch(enderecoApi + caminho + "/historico");
                 const historico = await resposta.json();
                 if (!resposta.ok) throw new Error(historico.mensagem || "Não foi possível carregar o histórico.");
                 mostrarHistorico(historico);

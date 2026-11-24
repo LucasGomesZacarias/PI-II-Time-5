@@ -3,9 +3,6 @@ export class NavBarComp extends HTMLElement{
         super();
         // Determina se pode ou não receber alterações de fora
         this.attachShadow({ mode: 'open' });
-        //Deixando pronto ja para receber o nome do usuario (componente dinamico)
-        const nomeUser = this.getAttribute('nome');
-        const iniciais = this.getAttribute('iniciais');
         const paginaAtual = this.getAttribute('pagina-atual');
 
         //Crie seu Componete Padrão aqui
@@ -82,6 +79,20 @@ export class NavBarComp extends HTMLElement{
                 font-weight: bold;
             }
 
+            .sair {
+                padding: 8px 12px;
+                border: 1px solid #2c2a3a;
+                border-radius: 4px;
+                background-color: transparent;
+                color: #edecf3;
+                font-size: 14px;
+                cursor: pointer;
+            }
+
+            .sair:hover {
+                background-color: #6d4aff;
+            }
+
             @media (max-width: 768px) {
                 .cabecalho {
                     flex-direction: column;
@@ -111,12 +122,48 @@ export class NavBarComp extends HTMLElement{
             </nav>
 
             <div class="usuario">
-                <span class="avatar">${iniciais}</span>
-                <span>${nomeUser}</span>
+                <span class="avatar" id="avatarUsuario"></span>
+                <span id="nomeUsuario"></span>
+                <button class="sair" id="botaoSair">Sair</button>
              </div>
 
         </header>
         `
+
+        // pergunta ao servidor quem está logado e mostra o nome e as iniciais (igual ao sessao.js da aula)
+        const avatarUsuario = this.shadowRoot.getElementById('avatarUsuario');
+        const nomeUsuario = this.shadowRoot.getElementById('nomeUsuario');
+
+        async function carregarSessao() {
+            const resposta = await fetch('/sessao');
+
+            // sem sessão (ou sessão vencida): volta para o login
+            if (!resposta.ok) {
+                window.location.replace('/telaLogin/index.html');
+                return;
+            }
+
+            const usuario = await resposta.json();
+            const partes = usuario.nome.trim().split(/\s+/);
+            const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
+
+            avatarUsuario.textContent = (partes[0][0] + ultima).toUpperCase();
+            nomeUsuario.textContent = usuario.nome;
+        }
+
+        carregarSessao();
+
+        // botão sair: pede ao servidor para encerrar a sessão e volta para a tela de login
+        const botaoSair = this.shadowRoot.getElementById('botaoSair');
+
+        botaoSair.addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.replace('/telaLogin/index.html');
+            } catch (erro) {
+                alert('Não foi possível sair. Tente novamente.');
+            }
+        });
 
     }
 

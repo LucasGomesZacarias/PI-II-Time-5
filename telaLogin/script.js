@@ -4,9 +4,6 @@
 //Página para onde o login leva
 const PAGINA_APOS_LOGIN = "../Dashboard/dashboard.html";
 
-//Chave onde o usuário logado fica guardado no navegador (sessionStorage)
-const CHAVE_USUARIO_LOGADO = "usuarioLogado";
-
 //Troca entre login e cadastro
 const card = document.querySelector(".card");
 const botaoFacaLogin = document.querySelector("#btnFacaLogin");
@@ -172,8 +169,7 @@ formularioLogin.addEventListener("submit", async function (event) {
     try {
         const usuario = await loginApi(email, senha);
 
-        //Guarda o usuário (sem senha) para as outras telas e vai para a página inicial
-        sessionStorage.setItem(CHAVE_USUARIO_LOGADO, JSON.stringify(usuario));
+        //O servidor já guardou o usuário na sessão (cookie): é só ir para a página inicial
         mensagemLogin.innerText = "Login realizado! Redirecionando...";
         window.location.href = PAGINA_APOS_LOGIN;
     } catch (erro) {
