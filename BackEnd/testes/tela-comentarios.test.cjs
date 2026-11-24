@@ -6,9 +6,10 @@ const path = require("node:path");
 const vm = require("node:vm");
 const codigo = fs.readFileSync(path.join(__dirname, "../../detalhes_demanda/apiReal.js"), "utf8");
 
-async function abrirTela(usuario, respostaPost = { status: 201, dados: { mensagem: "Criado" } }) {
+async function abrirTela(usuario, respostaPost = { status: 201, dados: { mensagem: "Criado" } }, respostaLista = null) {
     const elementos = {};
     const envios = [];
+    const consultas = [];
     function el(seletor) {
         if (!elementos[seletor]) elementos[seletor] = {
             textContent: "", value: "", hidden: true, disabled: false, children: [],
@@ -22,18 +23,22 @@ async function abrirTela(usuario, respostaPost = { status: 201, dados: { mensage
         URLSearchParams, Number, Date, Error, String, JSON, encodeURIComponent,
         window: { location: { search: "?id=1" } },
         sessionStorage: { getItem() { return usuario ? JSON.stringify(usuario) : null; } },
-        document: { querySelector: el, createElement() { return { textContent: "", append() {} }; } },
+        document: { querySelector: el, createElement() { return { textContent: "", children: [], append(...itens) { this.children.push(...itens); } }; } },
         fetch: async (url, opcoes) => {
+            consultas.push({ url, opcoes });
             if (opcoes && opcoes.method === "POST") {
                 envios.push(opcoes);
                 return { ok: respostaPost.status < 400, json: async () => respostaPost.dados };
+            }
+            if (url.endsWith("/comentarios") && respostaLista) {
+                return { ok: respostaLista.status < 400, json: async () => respostaLista.dados };
             }
             return { ok: true, json: async () => url.endsWith("/comentarios") ? [] : { id: 1, titulo: "Demanda" } };
         }
     };
     vm.runInNewContext(codigo, contexto);
     await new Promise(resolve => setImmediate(resolve));
-    return { el, envios };
+    return { el, envios, consultas };
 }
 
 test("sem login, impede a escrita e orienta o usuário", async () => {
@@ -42,12 +47,30 @@ test("sem login, impede a escrita e orienta o usuário", async () => {
     assert.match(el("#erro-comentario").textContent, /login/i);
 });
 
+test("mostra o erro de acesso e bloqueia o envio quando a leitura é negada", async () => {
+    const { el } = await abrirTela({ id: 7 }, undefined, { status: 403, dados: { mensagem: "Você não participa deste projeto." } });
+    assert.equal(el("#erro-comentario").textContent, "Você não participa deste projeto.");
+    assert.equal(el("#texto-comentario").disabled, true);
+    assert.equal(el("#botao-comentario").disabled, true);
+});
+
+test("mostra data e horário de cada comentário", async () => {
+    const dataHora = "2026-11-23T12:34:00Z";
+    const { el } = await abrirTela({ id: 7 }, undefined, { status: 200, dados: [{ autor: "Pessoa", texto: "Olá", dataHora }] });
+    const bloco = el("#lista-comentarios").children[0];
+    assert.equal(bloco.children[2].textContent, new Date(dataHora).toLocaleString("pt-BR"));
+});
+
 test("com login, envia o texto e identifica o usuário pelo fluxo da equipe", async () => {
-    const { el, envios } = await abrirTela({ id: 7 });
+    const { el, envios, consultas } = await abrirTela({ id: 7 });
     assert.equal(el("#texto-comentario").disabled, false);
     el("#texto-comentario").value = " Meu comentário ";
     await el("#formulario-comentario").enviar({ preventDefault() {} });
     assert.equal(envios[0].headers["x-usuario-id"], "7");
+    const consultasComentarios = consultas.filter(item => item.url.endsWith('/comentarios') && (!item.opcoes || item.opcoes.method !== 'POST'));
+    assert.ok(consultasComentarios.length >= 2);
+    assert.equal(consultasComentarios[0].opcoes.headers['x-usuario-id'], '7');
+    assert.equal(consultasComentarios[1].opcoes.headers['x-usuario-id'], '7');
     assert.deepEqual(JSON.parse(envios[0].body), { texto: "Meu comentário" });
     assert.equal(el("#texto-comentario").value, "");
 });

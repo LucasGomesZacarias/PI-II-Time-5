@@ -252,9 +252,60 @@ section p {
     width: 45%;
 }
 
+#formulario-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+#novo-status {
+    padding: 9px;
+    border: 1px solid #454255;
+    border-radius: 6px;
+    background-color: #1e1d29;
+    color: #edecf3;
+    font: inherit;
+}
+
 .comentarios h3 {
     margin-top: 0;
     font-size: 18px;
+}
+
+#formulario-comentario {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#texto-comentario {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #454255;
+    border-radius: 6px;
+    background-color: #1e1d29;
+    color: #edecf3;
+    font: inherit;
+    resize: vertical;
+}
+
+#texto-comentario:focus-visible {
+    outline: 2px solid #8566ff;
+    outline-offset: 2px;
+}
+
+#texto-comentario:disabled {
+    opacity: 0.65;
+}
+
+#erro-comentario:not(:empty) {
+    color: #edecf3;
+    margin: 0;
 }
 
 .comentario {

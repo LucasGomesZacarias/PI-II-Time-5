@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
     <link rel="stylesheet" href="styleEdicaoDemanda.css">
     <!-- JavaScript com as validações -->
-    <script type="module" src="scriptEdicaoDemanda.js"></script>
+    <script type="module" src="scriptEdicaoDemanda.js?v=2"></script>
     <script type="module" src="/componentes/libComps.js"></script>
 </head>
 <body>
@@ -100,15 +100,15 @@
         <div class="row">
             <!-- responsável (opcional) -->
             <div class="col-md-3" id="containerResponsavel">
-                <label for="responsavel">ID do responsável (opcional):</label>
-                <input type="text" id="responsavel" name="responsavel">
+                <label for="responsavel">Responsável (opcional):</label>
+                <select id="responsavel" name="responsavel"></select>
                 <div id="erroResponsavel" class="invalid-feedback"></div>
             </div>
 
             <!-- projeto associado -->
              <div class="col-md-3" id="containerAssociado">
-                <label for="associado">ID do projeto associado:</label>
-                <input type="text" id="associado" name="associado" required>
+                <label for="associado">Projeto associado:</label>
+                <select id="associado" name="associado" required></select>
                 <div id="erroAssociado" class="invalid-feedback"></div>
             </div>
 

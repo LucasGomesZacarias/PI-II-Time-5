@@ -17,12 +17,14 @@ banco.getConn = async () => ({
         if (sql.includes("FROM Usuario WHERE id_usuario")) {
             if (binds.id === 1) return { rows: [{ id: 1, perfil: "Administrador" }] };
             if (binds.id === 2) return { rows: [{ id: 2, perfil: "Membro da Equipe" }] };
+            if (binds.id === 3) return { rows: [{ id: 3, perfil: "Membro da Equipe" }] };
             return { rows: [] };
         }
         if (sql.includes("FROM demanda WHERE id_demanda")) {
             return { rows: binds.id === 1 ? [{ projetoId: 10 }] : [] };
         }
-        if (sql.includes("FROM participa")) return { rows: [] };
+        if (sql.includes("FROM participa")) return { rows: binds.usuarioId === 3 ? [{}] : [] };
+        if (sql.includes("FROM comentario c")) return { rows: [{ autor: "Pessoa", texto: "Olá", dataHora: "2026-11-23T12:00:00Z" }] };
         if (sql.includes("INSERT INTO comentario")) {
             insercao = binds;
             return { rowsAffected: 1 };
@@ -71,4 +73,16 @@ test("recusa texto vazio sem gravar", async () => {
     insercao = null;
     assert.equal((await comentar(1, { texto: "   " })).status, 400);
     assert.equal(insercao, null);
+});
+
+test("leitura exige usuário e vínculo com o projeto", async () => {
+    async function listar(id) {
+        const headers = {};
+        if (id) headers["x-usuario-id"] = String(id);
+        return fetch(endereco + "/demandas/1/comentarios", { headers });
+    }
+    assert.equal((await listar(null)).status, 401);
+    assert.equal((await listar(2)).status, 403);
+    assert.equal((await listar(3)).status, 200);
+    assert.equal((await listar(1)).status, 200);
 });
