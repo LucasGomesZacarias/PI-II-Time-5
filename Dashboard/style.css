@@ -77,15 +77,21 @@ a {
 /* Área principal, apresentação e botão de atalho. */
 main {
   margin: 0 auto;
-  max-width: 1240px;
+  max-width: 1800px;
   padding: 48px 24px 64px;
 }
 
+/* O topo usa a mesma grade de 5 colunas das demandas: título à esquerda e resumo nas colunas 4 e 5. */
 .apresentacao {
-  align-items: flex-end;
-  display: flex;
-  justify-content: space-between;
+  align-items: start;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-bottom: 32px;
+}
+
+.apresentacao > div:first-child {
+  grid-column: 1 / 4;
 }
 
 .saudacao,
@@ -99,13 +105,18 @@ main {
 h1 {
   color: #edecf3;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 2rem;
+  font-size: 2.5rem;
   line-height: 1.2;
   margin-bottom: 10px;
 }
 
+.apresentacao .saudacao {
+  font-size: 0.9rem;
+}
+
 .descricao {
   color: #9a97ac;
+  font-size: 1.1rem;
   line-height: 1.5;
   max-width: 620px;
 }
@@ -122,48 +133,174 @@ h1 {
   background-color: #8566ff;
 }
 
-/* Cards que apresentam as quantidades de demandas por status. */
-.resumo {
+/* Topo das colunas: total à esquerda e atalho para as demandas à direita. */
+.topo-colunas {
+  align-items: center;
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 28px;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
-.card-resumo,
+.total {
+  color: #9a97ac;
+  font-size: 1.1rem;
+}
+
+.total strong {
+  color: #edecf3;
+}
+
+/* 5 colunas de status do mesmo tamanho, com um espaço maior entre elas. */
+.colunas {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.coluna,
 .bloco {
   background-color: #15141c;
   border: 1px solid #2c2a3a;
   border-radius: 8px;
 }
 
-.card-resumo {
-  border: 2px solid #6d4aff;
-  padding: 18px;
-  width: 180px;
+/* Cada coluna mostra o título, a bolinha de críticas, as demandas e o botão "Ver todas". */
+.coluna {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 560px;
+  min-width: 0;
+  padding: 20px;
 }
 
-.card-resumo p {
-  color: #9a97ac;
-  font-size: 0.85rem;
-  line-height: 1.3;
+.coluna-topo {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.card-resumo strong {
+.coluna-topo h2 {
   color: #edecf3;
-  display: block;
-  font-size: 2rem;
-  margin: 8px 0 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
 }
 
-.card-resumo span {
+/* Bolinha vermelha com a quantidade de demandas críticas da coluna. */
+.bolinha-criticas {
+  align-items: center;
+  background-color: #ff5470;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: bold;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.coluna-lista {
+  flex-grow: 1;
+  list-style: none;
+  padding-left: 0;
+}
+
+.coluna-lista li {
+  border-bottom: 1px solid #2c2a3a;
+  padding: 10px 0;
+}
+
+.coluna-lista strong,
+.coluna-lista span {
+  display: block;
+}
+
+.coluna-lista strong {
+  color: #edecf3;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.coluna-lista span {
   color: #9a97ac;
   font-size: 0.72rem;
 }
 
-.aberta { border: 2px solid #4ea1ff; }
-.andamento { border: 2px solid #f5a623; }
-.revisao { border: 2px solid #2dd4bf; }
+/* A bolinha vermelha da demanda crítica fica na mesma linha do título. */
+.coluna-lista strong .ponto {
+  display: inline-block;
+}
+
+.coluna-lista .data-prazo {
+  color: #ffd166;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.coluna-lista .coluna-vazia {
+  border-bottom: 0;
+  color: #9a97ac;
+  font-size: 0.78rem;
+}
+
+.ver-todas {
+  border: 1px solid #6d4aff;
+  border-radius: 4px;
+  color: #8566ff;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 12px;
+  padding: 8px;
+  text-align: center;
+}
+
+.ver-todas:hover {
+  background-color: #6d4aff;
+  color: #ffffff;
+}
+
+/* Resumo por prioridade e tipo no canto superior direito.
+   Cada quadrado tem 80% da largura de uma coluna (menor, nunca maior) e fica encostado na direita. */
+.resumo-topo {
+  display: grid;
+  gap: 24px;
+  grid-column: 4 / 6;
+  grid-template-columns: repeat(2, calc((100% - 24px) * 0.4));
+  justify-content: end;
+}
+
+.resumo-topo .bloco {
+  min-width: 0;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.resumo-topo .titulo-bloco {
+  margin-bottom: 10px;
+}
+
+.resumo-topo .titulo-bloco h2 {
+  font-size: 0.8rem;
+}
+
+.resumo-topo .rotulo {
+  display: none;
+}
+
+.resumo-topo .linha-prioridade {
+  margin-bottom: 6px;
+}
+
+.resumo-topo .lista-tipos div {
+  padding: 4px;
+}
+
+.aberta { border: 2px solid #b3a3ff; }
+.andamento { border: 2px solid #8566ff; }
+.revisao { border: 2px solid #6d4aff; }
 .concluida { border: 2px solid #34d399; }
 .cancelada { border: 2px solid #8d899c; }
 
@@ -381,6 +518,14 @@ footer {
   text-align: center;
 }
 
+/* Em telas médias, as colunas passam para 3 por linha e o resumo desce para uma linha própria. */
+@media (max-width: 1100px) {
+  .colunas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .apresentacao { grid-template-columns: minmax(0, 1fr); }
+  .apresentacao > div:first-child,
+  .resumo-topo { grid-column: auto; }
+}
+
 /* Ajustes de layout para telas menores. */
 @media (max-width: 768px) {
   .cabecalho,
@@ -397,6 +542,11 @@ footer {
   .prazos { width: 100%; }
 
   .busca-demanda { align-items: stretch; flex-direction: column; }
+
+  /* No celular, as colunas e o resumo ficam um embaixo do outro. */
+  .colunas,
+  .resumo-topo { grid-template-columns: minmax(0, 1fr); }
+  .coluna { min-height: 0; }
 }
 
 /* Ajustes adicionais para celulares estreitos. */

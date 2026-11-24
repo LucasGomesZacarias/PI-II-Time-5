@@ -1,77 +1,8 @@
 // Autor: Gabriel Grigoletto Ribas.
-// Validação e busca das demandas críticas exibidas no Dashboard.
+// Montagem do Dashboard: colunas por status, prioridades e tipos.
 // Integração com a API (GET /dashboard): Luiz Felipe da Conceição.
 
-// Localiza o formulário, seus campos e a mensagem de erro da API.
-const formularioBusca = document.querySelector("#formBuscaDemanda");
-const campoBusca = document.querySelector("#buscaDemanda");
-const botaoLimpar = document.querySelector("#limparBusca");
-const mensagemBusca = document.querySelector("#mensagemBusca");
 const mensagemDashboard = document.querySelector("#mensagemDashboard");
-
-// As linhas da tabela são criadas depois que a API responde, por isso são buscadas a cada uso.
-function linhasDemandas() {
-  return document.querySelectorAll("#tabelaCriticas tr");
-}
-
-// Impede o envio do formulário e valida o texto digitado.
-formularioBusca.addEventListener("submit", function (evento) {
-  evento.preventDefault();
-
-  const termo = campoBusca.value.trim().toLowerCase();
-  mensagemBusca.classList.add("erro-busca");
-
-  if (termo === "") {
-    mensagemBusca.innerText = "Digite o código ou o título de uma demanda.";
-    return;
-  }
-
-  if (termo.length < 3) {
-    mensagemBusca.innerText = "Digite pelo menos 3 caracteres para buscar.";
-    return;
-  }
-
-  if (termo.length > 80) {
-    mensagemBusca.innerText = "A busca deve ter no máximo 80 caracteres.";
-    return;
-  }
-
-  // Procura o termo no código e no título de cada linha, sem alterar os dados.
-  let quantidadeEncontrada = 0;
-
-  linhasDemandas().forEach(function (linha) {
-    const codigoETitulo = linha.querySelector("td").innerText.toLowerCase();
-
-    if (codigoETitulo.includes(termo)) {
-      linha.classList.remove("linha-oculta");
-      quantidadeEncontrada++;
-    } else {
-      linha.classList.add("linha-oculta");
-    }
-  });
-
-  // Apresenta uma mensagem clara para zero, um ou vários resultados.
-  if (quantidadeEncontrada === 0) {
-    mensagemBusca.innerText = "Nenhuma demanda crítica encontrada.";
-  } else if (quantidadeEncontrada === 1) {
-    mensagemBusca.classList.remove("erro-busca");
-    mensagemBusca.innerText = "1 demanda crítica encontrada.";
-  } else {
-    mensagemBusca.classList.remove("erro-busca");
-    mensagemBusca.innerText = quantidadeEncontrada + " demandas críticas encontradas.";
-  }
-});
-
-// Limpa o campo e mostra novamente todas as demandas críticas da tabela.
-botaoLimpar.addEventListener("click", function () {
-  campoBusca.value = "";
-  mensagemBusca.innerText = "";
-  mensagemBusca.classList.remove("erro-busca");
-
-  linhasDemandas().forEach(function (linha) {
-    linha.classList.remove("linha-oculta");
-  });
-});
 
 // Códigos, títulos e nomes vêm do banco: escapa antes de colocar no HTML.
 function escaparHtml(texto) {
@@ -102,13 +33,9 @@ function criarCodigo(id) {
   return "DEM-" + id;
 }
 
-// Preenche os números dos cards, das prioridades (com as barras) e dos tipos.
+// Preenche o total, as prioridades (com as barras) e os tipos.
 function mostrarContagens(dados) {
   document.querySelector("#totalDemandas").innerText = dados.totalDemandas;
-
-  document.querySelectorAll("[data-status]").forEach(function (elemento) {
-    elemento.innerText = dados.porStatus[elemento.dataset.status];
-  });
 
   document.querySelectorAll("[data-tipo]").forEach(function (linha) {
     linha.querySelector("strong").innerText = dados.porTipo[linha.dataset.tipo];
@@ -126,58 +53,40 @@ function mostrarContagens(dados) {
   });
 }
 
-// Monta a tabela das demandas críticas em aberto.
-function mostrarCriticas(demandas) {
-  const corpo = document.querySelector("#tabelaCriticas");
+// Preenche cada coluna: a bolinha vermelha com as críticas e as demandas de prazo mais próximo.
+function mostrarColunas(colunas) {
+  document.querySelectorAll("[data-coluna]").forEach(function (elemento) {
+    const dadosColuna = colunas[elemento.dataset.coluna];
+    const bolinha = elemento.querySelector("[data-criticas]");
+    const lista = elemento.querySelector("[data-lista]");
 
-  corpo.innerHTML = "";
+    // a bolinha só aparece se a coluna tiver demandas críticas
+    if (dadosColuna.criticas > 0) {
+      bolinha.innerText = dadosColuna.criticas;
+      bolinha.classList.remove("d-none");
+    } else {
+      bolinha.classList.add("d-none");
+    }
 
-  if (demandas.length === 0) {
-    corpo.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center">Nenhuma demanda crítica em aberto.</td>
-      </tr>
-    `;
-    return;
-  }
+    lista.innerHTML = "";
 
-  demandas.forEach(function (demanda) {
-    corpo.innerHTML += `
-      <tr>
-        <td><span class="tag critica-tag">Crítica</span> ${criarCodigo(demanda.id)} - ${escaparHtml(demanda.titulo)}</td>
-        <td>${escaparHtml(demanda.projeto)}</td>
-        <td>${demanda.responsavel ? escaparHtml(demanda.responsavel) : "Sem responsável"}</td>
-        <td>${formatarData(demanda.prazo, true)}</td>
-      </tr>
-    `;
-  });
-}
+    if (dadosColuna.demandas.length === 0) {
+      lista.innerHTML = `<li class="coluna-vazia">Nenhuma demanda</li>`;
+      return;
+    }
 
-// Monta a lista das demandas com prazo nos próximos 7 dias.
-function mostrarPrazos(demandas) {
-  const lista = document.querySelector("#listaPrazos");
+    dadosColuna.demandas.forEach(function (demanda) {
+      // a demanda crítica ganha uma bolinha vermelha ao lado do título
+      const pontoCritico = demanda.prioridade === "Crítica" ? `<span class="ponto critica"></span>` : "";
 
-  lista.innerHTML = "";
-
-  if (demandas.length === 0) {
-    lista.innerHTML = `
-      <li>
-        <div><span>Nenhuma demanda com prazo nos próximos 7 dias.</span></div>
-      </li>
-    `;
-    return;
-  }
-
-  demandas.forEach(function (demanda) {
-    lista.innerHTML += `
-      <li>
-        <div>
-          <strong>${criarCodigo(demanda.id)} - ${escaparHtml(demanda.titulo)}</strong>
-          <span>${escaparHtml(demanda.tipo)} - ${escaparHtml(demanda.prioridade)} - ${escaparHtml(demanda.status)}</span>
-        </div>
-        <span class="data-prazo">${formatarData(demanda.prazo, false)}</span>
-      </li>
-    `;
+      lista.innerHTML += `
+        <li>
+          <strong>${pontoCritico}${criarCodigo(demanda.id)} - ${escaparHtml(demanda.titulo)}</strong>
+          <span>${escaparHtml(demanda.tipo)} - ${escaparHtml(demanda.prioridade)}</span>
+          <span class="data-prazo">${formatarData(demanda.prazo, false)}</span>
+        </li>
+      `;
+    });
   });
 }
 
@@ -189,8 +98,7 @@ async function carregarDashboard() {
     mensagemDashboard.classList.add("d-none");
 
     mostrarContagens(dados);
-    mostrarCriticas(dados.demandasCriticasEmAberto);
-    mostrarPrazos(dados.demandasProximasDoPrazo);
+    mostrarColunas(dados.colunas);
   } catch (erro) {
     mensagemDashboard.innerText = erro.message;
     mensagemDashboard.classList.remove("d-none");

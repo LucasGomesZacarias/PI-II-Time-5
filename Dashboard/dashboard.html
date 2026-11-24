@@ -11,7 +11,7 @@
   >
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
-  <!-- api.js busca os dados em GET /dashboard; script.js preenche a tela e valida a busca. -->
+  <!-- api.js busca os dados em GET /dashboard; script.js preenche a tela. -->
   <script src="api.js" defer></script>
   <script src="script.js" defer></script>
   <script type="module" src="/componentes/libComps.js"></script>
@@ -22,7 +22,7 @@
   <comp-navbar pagina-atual="dashboard"></comp-navbar>
 
   <main id="inicio">
-    <!-- Apresentação do painel e atalho para as demandas importantes. -->
+    <!-- Topo: título à esquerda e, no canto direito, o resumo por prioridade e por tipo. -->
     <div class="apresentacao">
       <div>
         <p class="saudacao">Visão geral</p>
@@ -32,164 +32,118 @@
         </p>
       </div>
 
-      <a class="botao" href="#demandas">Ver demandas</a>
+      <!-- Os dois quadrados ficam lado a lado, cada um com 80% da largura de uma coluna. -->
+      <div class="resumo-topo">
+        <div class="bloco distribuicao">
+          <div class="titulo-bloco">
+            <div>
+              <p class="rotulo">Distribuição</p>
+              <h2>Demandas por prioridade</h2>
+            </div>
+          </div>
+
+          <!-- A largura de cada barra é calculada pelo script.js. -->
+          <div class="prioridades">
+            <div class="linha-prioridade" data-prioridade="Crítica">
+              <span class="ponto critica"></span>
+              <span class="nome-prioridade">Crítica</span>
+              <div class="barra"><span class="preenchimento critica-barra"></span></div>
+              <strong>-</strong>
+            </div>
+            <div class="linha-prioridade" data-prioridade="Alta">
+              <span class="ponto alta"></span>
+              <span class="nome-prioridade">Alta</span>
+              <div class="barra"><span class="preenchimento alta-barra"></span></div>
+              <strong>-</strong>
+            </div>
+            <div class="linha-prioridade" data-prioridade="Média">
+              <span class="ponto media"></span>
+              <span class="nome-prioridade">Média</span>
+              <div class="barra"><span class="preenchimento media-barra"></span></div>
+              <strong>-</strong>
+            </div>
+            <div class="linha-prioridade" data-prioridade="Baixa">
+              <span class="ponto baixa"></span>
+              <span class="nome-prioridade">Baixa</span>
+              <div class="barra"><span class="preenchimento baixa-barra"></span></div>
+              <strong>-</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="bloco tipos">
+          <div class="titulo-bloco">
+            <div>
+              <p class="rotulo">Classificação</p>
+              <h2>Demandas por tipo</h2>
+            </div>
+          </div>
+
+          <div class="lista-tipos">
+            <div data-tipo="Tarefa"><span>Tarefas</span><strong>-</strong></div>
+            <div data-tipo="Defeito"><span>Defeitos</span><strong>-</strong></div>
+            <div data-tipo="Melhoria"><span>Melhorias</span><strong>-</strong></div>
+            <div data-tipo="Documentação"><span>Documentação</span><strong>-</strong></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Erro devolvido pela API (ou servidor fora do ar). Fica escondido quando tudo dá certo. -->
     <div id="mensagemDashboard" class="alert alert-danger d-none" role="alert"></div>
 
-    <!-- Contagem por status. Os números vêm de GET /dashboard (o script.js preenche). -->
-    <div class="resumo">
-      <div class="card-resumo total">
-        <p>Total de demandas</p>
-        <strong id="totalDemandas">-</strong>
-        <span>Todos os projetos</span>
-      </div>
-
-      <div class="card-resumo aberta">
-        <p>Abertas</p>
-        <strong data-status="Aberta">-</strong>
-        <span>Aguardando início</span>
-      </div>
-
-      <div class="card-resumo andamento">
-        <p>Em andamento</p>
-        <strong data-status="Em andamento">-</strong>
-        <span>Em execução</span>
-      </div>
-
-      <div class="card-resumo revisao">
-        <p>Em revisão</p>
-        <strong data-status="Em revisão">-</strong>
-        <span>Aguardando validação</span>
-      </div>
-
-      <div class="card-resumo concluida">
-        <p>Concluídas</p>
-        <strong data-status="Concluída">-</strong>
-        <span>Finalizadas</span>
-      </div>
-
-      <div class="card-resumo cancelada">
-        <p>Canceladas</p>
-        <strong data-status="Cancelada">-</strong>
-        <span>Não serão executadas</span>
-      </div>
+    <!-- Total de demandas e atalho para a listagem. -->
+    <div class="topo-colunas">
+      <p class="total">Total: <strong id="totalDemandas">-</strong></p>
+      <a class="botao" href="/ListagemDemandas/ListagemDemandas.html">Ver demandas</a>
     </div>
 
-    <!-- Distribuição das demandas por prioridade e por tipo. -->
-    <div class="painel">
-      <div class="bloco distribuicao" id="projetos">
-        <div class="titulo-bloco">
-          <div>
-            <p class="rotulo">Distribuição</p>
-            <h2>Demandas por prioridade</h2>
-          </div>
-          <a href="#demandas">Ver lista</a>
+    <!-- Uma coluna para cada status. Os dados vêm de GET /dashboard. -->
+    <div class="colunas">
+      <section class="coluna aberta" data-coluna="Aberta">
+        <div class="coluna-topo">
+          <h2>Abertas</h2>
+          <span class="bolinha-criticas d-none" data-criticas></span>
         </div>
+        <ul class="coluna-lista" data-lista></ul>
+        <a class="ver-todas" href="/ListagemDemandas/ListagemDemandas.html?status=Aberta">Ver todas</a>
+      </section>
 
-        <!-- A largura de cada barra é calculada pelo script.js. -->
-        <div class="prioridades">
-          <div class="linha-prioridade" data-prioridade="Crítica">
-            <span class="ponto critica"></span>
-            <span class="nome-prioridade">Crítica</span>
-            <div class="barra"><span class="preenchimento critica-barra"></span></div>
-            <strong>-</strong>
-          </div>
-          <div class="linha-prioridade" data-prioridade="Alta">
-            <span class="ponto alta"></span>
-            <span class="nome-prioridade">Alta</span>
-            <div class="barra"><span class="preenchimento alta-barra"></span></div>
-            <strong>-</strong>
-          </div>
-          <div class="linha-prioridade" data-prioridade="Média">
-            <span class="ponto media"></span>
-            <span class="nome-prioridade">Média</span>
-            <div class="barra"><span class="preenchimento media-barra"></span></div>
-            <strong>-</strong>
-          </div>
-          <div class="linha-prioridade" data-prioridade="Baixa">
-            <span class="ponto baixa"></span>
-            <span class="nome-prioridade">Baixa</span>
-            <div class="barra"><span class="preenchimento baixa-barra"></span></div>
-            <strong>-</strong>
-          </div>
+      <section class="coluna andamento" data-coluna="Em andamento">
+        <div class="coluna-topo">
+          <h2>Andamento</h2>
+          <span class="bolinha-criticas d-none" data-criticas></span>
         </div>
-      </div>
+        <ul class="coluna-lista" data-lista></ul>
+        <a class="ver-todas" href="/ListagemDemandas/ListagemDemandas.html?status=Em andamento">Ver todas</a>
+      </section>
 
-      <div class="bloco tipos">
-        <div class="titulo-bloco">
-          <div>
-            <p class="rotulo">Classificação</p>
-            <h2>Demandas por tipo</h2>
-          </div>
+      <section class="coluna revisao" data-coluna="Em revisão">
+        <div class="coluna-topo">
+          <h2>Revisão</h2>
+          <span class="bolinha-criticas d-none" data-criticas></span>
         </div>
+        <ul class="coluna-lista" data-lista></ul>
+        <a class="ver-todas" href="/ListagemDemandas/ListagemDemandas.html?status=Em revisão">Ver todas</a>
+      </section>
 
-        <div class="lista-tipos">
-          <div data-tipo="Tarefa"><span>Tarefas</span><strong>-</strong></div>
-          <div data-tipo="Defeito"><span>Defeitos</span><strong>-</strong></div>
-          <div data-tipo="Melhoria"><span>Melhorias</span><strong>-</strong></div>
-          <div data-tipo="Documentação"><span>Documentação</span><strong>-</strong></div>
+      <section class="coluna concluida" data-coluna="Concluída">
+        <div class="coluna-topo">
+          <h2>Concluídos</h2>
+          <span class="bolinha-criticas d-none" data-criticas></span>
         </div>
-      </div>
-    </div>
+        <ul class="coluna-lista" data-lista></ul>
+        <a class="ver-todas" href="/ListagemDemandas/ListagemDemandas.html?status=Concluída">Ver todas</a>
+      </section>
 
-    <!-- Demandas que exigem atenção: críticas abertas e prazos próximos. -->
-    <div class="demandas-importantes" id="demandas">
-      <div class="bloco tabela-bloco">
-        <div class="titulo-bloco">
-          <div>
-            <p class="rotulo alerta">Atenção imediata</p>
-            <h2>Demandas críticas em aberto</h2>
-          </div>
-          <a href="#demandas">Ver todas</a>
+      <section class="coluna cancelada" data-coluna="Cancelada">
+        <div class="coluna-topo">
+          <h2>Cancelados</h2>
+          <span class="bolinha-criticas d-none" data-criticas></span>
         </div>
-
-        <!-- Busca local por código ou título nas demandas críticas mostradas abaixo. -->
-        <form id="formBuscaDemanda" class="busca-demanda">
-          <div class="campo-busca">
-            <label for="buscaDemanda">Buscar demanda crítica</label>
-            <input id="buscaDemanda" type="text" placeholder="Código ou título da demanda">
-          </div>
-          <button class="botao-busca" type="submit">Buscar</button>
-          <button class="botao-limpar" id="limparBusca" type="button">Limpar</button>
-        </form>
-        <p id="mensagemBusca" class="mensagem-busca"></p>
-
-        <!-- As linhas vêm da API. O JavaScript mostra ou esconde linhas após validar a busca. -->
-        <div class="table-responsive">
-          <table id="tabelaDemandas" class="table table-dark table-striped table-hover align-middle tabela-demandas">
-            <thead class="table-dark">
-              <tr>
-                <th>Demanda</th>
-                <th>Projeto</th>
-                <th>Responsável</th>
-                <th>Prazo</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaCriticas">
-              <tr>
-                <td colspan="4" class="text-center">Carregando...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="bloco prazos">
-        <div class="titulo-bloco">
-          <div>
-            <p class="rotulo">Planejamento</p>
-            <h2>Próximas do prazo</h2>
-          </div>
-        </div>
-
-        <ul class="lista-prazos" id="listaPrazos">
-          <li>
-            <div><span>Carregando...</span></div>
-          </li>
-        </ul>
-      </div>
+        <ul class="coluna-lista" data-lista></ul>
+        <a class="ver-todas" href="/ListagemDemandas/ListagemDemandas.html?status=Cancelada">Ver todas</a>
+      </section>
     </div>
   </main>
 

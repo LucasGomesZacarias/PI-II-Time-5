@@ -70,8 +70,15 @@
         carregarDemandas(evento.detail);
     });
 
-    // carrega a lista completa ao abrir a página
-    carregarDemandas();
+    // se a URL trouxe ?status=..., já abre a lista filtrada (vem dos botões "Ver todas" do Dashboard)
+    const status = new URLSearchParams(location.search).get("status");
+
+    if (status) {
+        carregarDemandas({ status: status });
+    } else {
+        // carrega a lista completa ao abrir a página
+        carregarDemandas();
+    }
     </script>
 
     <footer>

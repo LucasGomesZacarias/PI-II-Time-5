@@ -43,6 +43,7 @@ export function rotasDashboard(app: Express) {
         tipoResult,
         criticasResult,
         proximasDoPrazoResult,
+        todasResult,
       ] = await Promise.all([
         // Total geral de demandas cadastradas.
         conn.execute(`
@@ -109,6 +110,19 @@ export function rotasDashboard(app: Express) {
             AND d.prazo < TRUNC(SYSDATE) + 8
           ORDER BY d.prazo, d.id_demanda
         `),
+
+        // Todas as demandas, com o prazo mais próximo primeiro (sem prazo por último).
+        conn.execute(`
+          SELECT
+            d.id_demanda AS "id",
+            d.titulo AS "titulo",
+            d.tipo AS "tipo",
+            d.prioridade AS "prioridade",
+            d.status AS "status",
+            TO_CHAR(d.prazo, 'YYYY-MM-DD') AS "prazo"
+          FROM Demanda d
+          ORDER BY d.prazo NULLS LAST, d.id_demanda
+        `),
       ]);
 
       // Obtém o total retornado pelo banco.
@@ -132,6 +146,25 @@ export function rotasDashboard(app: Express) {
         (tipoResult.rows ?? []) as LinhaContagem[]
       );
 
+      // Monta as colunas: quantas críticas cada status tem e as 3 demandas de prazo mais próximo.
+      const colunas: Record<string, { criticas: number; demandas: any[] }> = {};
+
+      ["Aberta", "Em andamento", "Em revisão", "Concluída", "Cancelada"].forEach(function (status) {
+        colunas[status] = { criticas: 0, demandas: [] };
+      });
+
+      (todasResult.rows ?? []).forEach(function (demanda: any) {
+        const coluna = colunas[demanda.status];
+
+        if (demanda.prioridade === "Crítica") {
+          coluna.criticas++;
+        }
+
+        if (coluna.demandas.length < 3) {
+          coluna.demandas.push(demanda);
+        }
+      });
+
       // Envia todos os dados do dashboard em formato JSON.
       return res.status(200).json({
         criterios: {
@@ -144,6 +177,7 @@ export function rotasDashboard(app: Express) {
         porStatus,
         porPrioridade,
         porTipo,
+        colunas,
         demandasCriticasEmAberto: criticasResult.rows ?? [],
         demandasProximasDoPrazo: proximasDoPrazoResult.rows ?? [],
       });
